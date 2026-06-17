@@ -1,0 +1,20 @@
+import { describe, it, expect } from 'vitest'
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './accordion'
+
+describe('Accordion, AccordionItem, AccordionTrigger, AccordionContent', () => {
+  it('exports Accordion', () => {
+    expect(Accordion).toBeDefined()
+  })
+
+  it('exports AccordionItem', () => {
+    expect(AccordionItem).toBeDefined()
+  })
+
+  it('exports AccordionTrigger', () => {
+    expect(AccordionTrigger).toBeDefined()
+  })
+
+  it('exports AccordionContent', () => {
+    expect(AccordionContent).toBeDefined()
+  })
+})

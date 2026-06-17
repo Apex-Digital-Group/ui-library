@@ -1,0 +1,50 @@
+/**
+ * Bond typography layer.
+ * Loads Inter and exposes semantic prose classes that compose the Tailwind
+ * font-size scale defined in `tailwind.preset.js`. Import this once at app
+ * root alongside `styles.css`.
+ *
+ *   <h1 class="t-display-xl">…</h1>
+ *   <p class="t-body-md">…</p>
+ *   <span class="t-eyebrow">SECTION</span>
+ *
+ * The scale is purposely small — six display sizes, five body sizes, three
+ * labels, one eyebrow — so every screen pulls from the same rhythm.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+html,
+body {
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-display tracking-tight text-foreground;
+}
+
+.t-display-2xl { @apply font-display text-display-2xl text-foreground; }
+.t-display-xl  { @apply font-display text-display-xl  text-foreground; }
+.t-display-lg  { @apply font-display text-display-lg  text-foreground; }
+.t-display-md  { @apply font-display text-display-md  text-foreground; }
+.t-display-sm  { @apply font-display text-display-sm  text-foreground; }
+.t-display-xs  { @apply font-display text-display-xs  text-foreground; }
+
+.t-body-xl     { @apply font-sans text-body-xl text-foreground; }
+.t-body-lg     { @apply font-sans text-body-lg text-foreground; }
+.t-body-md     { @apply font-sans text-body-md text-foreground; }
+.t-body-sm     { @apply font-sans text-body-sm text-muted-foreground; }
+.t-body-xs     { @apply font-sans text-body-xs text-muted-foreground; }
+
+.t-label-lg    { @apply font-sans text-label-lg text-foreground; }
+.t-label-md    { @apply font-sans text-label-md text-foreground; }
+.t-label-sm    { @apply font-sans text-label-sm text-muted-foreground; }
+
+.t-eyebrow     { @apply font-sans text-eyebrow uppercase text-muted-foreground; }
+
+.t-link        { @apply text-primary underline-offset-4 hover:underline; }
+.t-code        { @apply font-mono text-[0.9em] bg-muted px-1.5 py-0.5 rounded-sm; }
