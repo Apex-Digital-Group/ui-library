@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import BaseModal from '../BaseModal';
 
 export default function PayoutModal({ payout, isOpen, onClose }) {
   if (!payout) return null;
@@ -12,16 +13,7 @@ export default function PayoutModal({ payout, isOpen, onClose }) {
   ];
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={onClose}
-          >
+    <BaseModal isOpen={isOpen} onClose={onClose} backdrop="bg-black/50 backdrop-blur-sm" zIndex={50}>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -109,9 +101,6 @@ export default function PayoutModal({ payout, isOpen, onClose }) {
                 </div>
               </div>
             </motion.div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+    </BaseModal>
   );
 }

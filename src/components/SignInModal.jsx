@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { X, Video, User } from 'lucide-react';
+import BaseModal from './BaseModal';
 
 export default function SignInModal({ isOpen, onClose }) {
   const [step, setStep] = useState('select'); // 'select' or 'login'
@@ -10,18 +11,12 @@ export default function SignInModal({ isOpen, onClose }) {
   const [error, setError] = useState('');
 
   React.useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+    if (!isOpen) {
       setStep('select');
       setUserType(null);
       setUsername('');
       setPassword('');
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, [isOpen]);
 
   const handleSelectType = (type) => {
@@ -45,17 +40,8 @@ export default function SignInModal({ isOpen, onClose }) {
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[10000] flex items-center justify-center p-4"
-      >
+    <BaseModal isOpen={isOpen} onClose={onClose} lockScroll backdrop="bg-black/80 backdrop-blur-sm">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -176,7 +162,6 @@ export default function SignInModal({ isOpen, onClose }) {
             </div>
           )}
         </motion.div>
-      </motion.div>
-    </AnimatePresence>
+    </BaseModal>
   );
 }

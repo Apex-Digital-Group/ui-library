@@ -4,7 +4,7 @@ import GroupsLayout from './GroupsLayout'
 export default {
   title: 'Components/GroupsLayout',
   component: GroupsLayout,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],
 }
 

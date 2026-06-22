@@ -4,12 +4,12 @@ import PostDetailModal from './PostDetailModal'
 export default {
   title: 'Components/PostDetailModal',
   component: PostDetailModal,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],
 }
 
 export const Default = {
   name: 'PostDetailModal',
   render: (args) => <PostDetailModal {...args} />,
-  args: { open: true, onOpenChange: () => {}, onClose: () => {} },
+  args: { isOpen: true, onOpenChange: () => {}, onClose: () => {} },
 }

@@ -4,7 +4,7 @@ import AgencySettingsScreen from './AgencySettingsScreen'
 export default {
   title: 'Components/AgencySettingsScreen',
   component: AgencySettingsScreen,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],
 }
 

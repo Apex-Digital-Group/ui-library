@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Clock, CheckCircle } from 'lucide-react';
+import BaseModal from './BaseModal';
 
 export default function AccountPendingModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,14 +26,13 @@ export default function AccountPendingModal() {
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-[10001]"
-        >
+    <BaseModal
+      isOpen={isOpen}
+      onClose={() => setIsOpen(false)}
+      backdrop="bg-black/90 backdrop-blur-sm"
+      closeOnBackdrop={false}
+      zIndex={10001}
+    >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -76,8 +76,6 @@ export default function AccountPendingModal() {
               Simulate Admin Approval
             </Button>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    </BaseModal>
   );
 }

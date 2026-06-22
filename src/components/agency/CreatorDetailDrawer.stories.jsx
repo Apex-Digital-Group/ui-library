@@ -4,12 +4,12 @@ import CreatorDetailDrawer from './CreatorDetailDrawer'
 export default {
   title: 'Components/CreatorDetailDrawer',
   component: CreatorDetailDrawer,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],
 }
 
 export const Default = {
   name: 'CreatorDetailDrawer',
   render: (args) => <CreatorDetailDrawer {...args} />,
-  args: { open: true, onOpenChange: () => {}, onClose: () => {} },
+  args: { isOpen: true, onOpenChange: () => {}, onClose: () => {} },
 }

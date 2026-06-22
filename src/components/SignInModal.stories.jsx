@@ -4,12 +4,12 @@ import SignInModal from './SignInModal'
 export default {
   title: 'Components/SignInModal',
   component: SignInModal,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],
 }
 
 export const Default = {
   name: 'SignInModal',
   render: (args) => <SignInModal {...args} />,
-  args: { open: true, onOpenChange: () => {}, onClose: () => {} },
+  args: { isOpen: true, onOpenChange: () => {}, onClose: () => {} },
 }

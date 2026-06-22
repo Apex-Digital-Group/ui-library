@@ -1,12 +1,11 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { X, AlertTriangle } from 'lucide-react';
+import BaseModal from '../BaseModal';
 
 export default function LeaveGroupModal({ groupName, onConfirm, onClose }) {
   return (
-    <AnimatePresence>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/70 z-[10000] flex items-center justify-center p-4" onClick={onClose}>
+    <BaseModal isOpen={true} onClose={onClose} backdrop="bg-black/70">
         <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }}
           className="w-full max-w-md bg-[#2E2249] border border-white/20 rounded-2xl overflow-hidden"
           onClick={e => e.stopPropagation()}>
@@ -28,7 +27,6 @@ export default function LeaveGroupModal({ groupName, onConfirm, onClose }) {
             </div>
           </div>
         </motion.div>
-      </motion.div>
-    </AnimatePresence>
+    </BaseModal>
   );
 }

@@ -4,12 +4,12 @@ import RegisterModal from './RegisterModal'
 export default {
   title: 'Components/RegisterModal',
   component: RegisterModal,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],
 }
 
 export const Default = {
   name: 'RegisterModal',
   render: (args) => <RegisterModal {...args} />,
-  args: { open: true, onOpenChange: () => {}, onClose: () => {} },
+  args: { isOpen: true, onOpenChange: () => {}, onClose: () => {} },
 }

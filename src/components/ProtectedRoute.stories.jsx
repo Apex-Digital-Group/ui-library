@@ -34,7 +34,7 @@ export default {
   title: 'Components/ProtectedRoute',
   component: ProtectedRoute,
   tags: ['autodocs'],
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
 }
 
 export const SignedOut = {

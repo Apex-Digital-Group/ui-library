@@ -4,12 +4,12 @@ import TransactionsModal from './TransactionsModal'
 export default {
   title: 'Components/TransactionsModal',
   component: TransactionsModal,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],
 }
 
 export const Default = {
   name: 'TransactionsModal',
   render: (args) => <TransactionsModal {...args} />,
-  args: { open: true, onOpenChange: () => {}, onClose: () => {} },
+  args: { isOpen: true, onOpenChange: () => {}, onClose: () => {} },
 }

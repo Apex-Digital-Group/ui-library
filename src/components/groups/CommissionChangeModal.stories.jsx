@@ -1,7 +1,7 @@
 import * as React from 'react'
 import CommissionChangeModal from './CommissionChangeModal'
 
-export default { title: 'Components/Groups/CommissionChangeModal', component: CommissionChangeModal, tags: ['autodocs'], parameters: { layout: 'centered' } }
+export default { title: 'Components/Groups/CommissionChangeModal', component: CommissionChangeModal, tags: ['autodocs'], parameters: { layout: 'fullscreen' } }
 
 export const Default = {
   args: {

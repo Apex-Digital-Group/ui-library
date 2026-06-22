@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { X, Mail, CheckCircle } from 'lucide-react';
+import BaseModal from './BaseModal';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
@@ -40,15 +41,7 @@ export default function RegisterModal({ isOpen, onClose, userType = 'member' }) 
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[10000]"
-          onClick={onClose}
-        >
+    <BaseModal isOpen={isOpen} onClose={onClose} backdrop="bg-black/80 backdrop-blur-sm">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -188,8 +181,6 @@ export default function RegisterModal({ isOpen, onClose, userType = 'member' }) 
               </>
             )}
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    </BaseModal>
   );
 }
