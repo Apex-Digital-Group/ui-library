@@ -4,12 +4,12 @@ import TreatModal from './TreatModal'
 export default {
   title: 'Components/TreatModal',
   component: TreatModal,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],
 }
 
 export const Default = {
   name: 'TreatModal',
   render: (args) => <TreatModal {...args} />,
-  args: { open: true, onOpenChange: () => {}, onClose: () => {} },
+  args: { isOpen: true, onOpenChange: () => {}, onClose: () => {} },
 }

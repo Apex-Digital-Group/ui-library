@@ -1,6 +1,7 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { X, Sparkles, CreditCard, Bitcoin, ShoppingCart, ArrowLeft, Lock, ChevronRight } from 'lucide-react';
+import BaseModal from './BaseModal';
 
 const pricingAnchors = [
   { credits: 5,   price: 6.99,   ppc: 1.40 },
@@ -51,15 +52,11 @@ export default function CreditsModal({ isOpen, onClose }) {
   const showBetterValue = sliderValue >= 50;
 
   React.useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+    if (!isOpen) {
       setSelectedAmount(null);
       setPaymentMethod(null);
       setCardDetails({ number: '', name: '', expiry: '', cvv: '' });
     }
-    return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
   const handleBack = () => {
@@ -71,8 +68,6 @@ export default function CreditsModal({ isOpen, onClose }) {
     alert('Payment successful! Credits added to your account.');
     onClose();
   };
-
-  if (!isOpen) return null;
 
   const getTitle = () => {
     if (paymentMethod === 'card') return 'Card Payment';
@@ -88,19 +83,11 @@ export default function CreditsModal({ isOpen, onClose }) {
   };
 
   return (
-    <AnimatePresence>
+    <BaseModal isOpen={isOpen} onClose={onClose} lockScroll backdrop="bg-black/70 backdrop-blur-sm">
       <style>{`
         input[type='range']::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #9333ea; cursor: pointer; border: 2px solid white; box-shadow: 0 0 6px rgba(147,51,234,0.6); }
         input[type='range']::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #9333ea; cursor: pointer; border: 2px solid white; }
       `}</style>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[10000] flex items-center justify-center p-4"
-        style={{ margin: 0 }}
-      >
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -353,7 +340,6 @@ export default function CreditsModal({ isOpen, onClose }) {
 
           </div>
         </motion.div>
-      </motion.div>
-    </AnimatePresence>
+    </BaseModal>
   );
 }

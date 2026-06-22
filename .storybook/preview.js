@@ -5,6 +5,15 @@ import '../src/typography.css'
 const preview = {
   parameters: {
     controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
+    // Render Docs stories in an iframe, not inline. Many components here are
+    // full-screen overlays (`position: fixed; inset-0` modals/drawers); Storybook's
+    // inline Docs canvas wraps the story in a `transform: scale()` zoom container,
+    // and a transformed ancestor makes `position: fixed` resolve against that tiny
+    // box instead of the viewport — clipping the modal to a sliver. An iframe has
+    // its own viewport, so fixed overlays fill it correctly.
+    docs: {
+      story: { inline: false, height: '640px' },
+    },
     backgrounds: {
       default: 'app',
       values: [

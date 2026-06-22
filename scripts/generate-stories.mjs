@@ -80,8 +80,11 @@ function titleFor(absPath, baseName) {
   return baseName
 }
 
-function storyTemplate({ baseName, importPath, defaultExportName, namedComponents, isModalLike, isPage, title }) {
-  const defaultProps = isModalLike ? `{ open: true, onOpenChange: () => {}, onClose: () => {} }` : `{}`
+function storyTemplate({ baseName, importPath, defaultExportName, namedComponents, isModalLike, visibilityProp, isPage, isOverlay, title }) {
+  // base44-ported modals gate visibility on `isOpen`; shadcn primitives use `open`.
+  // Use whichever the component actually destructures so the story isn't blank.
+  const visProp = visibilityProp || 'open'
+  const defaultProps = isModalLike ? `{ ${visProp}: true, onOpenChange: () => {}, onClose: () => {} }` : `{}`
   const importLine = (() => {
     const parts = []
     if (defaultExportName) parts.push(defaultExportName)
@@ -122,7 +125,7 @@ ${importLine}
 export default {
   title: '${title}',
   component: ${defaultExportName || namedComponents[0] || 'undefined'},
-  parameters: { layout: '${isPage ? 'fullscreen' : 'centered'}' },
+  parameters: { layout: '${isPage || isOverlay ? 'fullscreen' : 'centered'}' },
   tags: ['autodocs'],
   decorators: [(Story) => <MemoryRouter><Story /></MemoryRouter>],
 }
@@ -193,6 +196,11 @@ async function main() {
 
     const importPath = './' + baseName
     const isModalLike = /Modal$/.test(baseName) || /Drawer$/.test(baseName) || /Dialog$/.test(baseName)
+    const visibilityProp = /\bisOpen\b/.test(src) ? 'isOpen' : 'open'
+    // Full-screen overlays (modals/drawers) must use `layout: fullscreen`, else
+    // Storybook's centered Docs canvas renders the story iframe ~300px wide and
+    // the `fixed inset-0` modal is squished. Detect from source, not just name.
+    const isOverlay = /fixed\s+inset-0/.test(src)
     const isPage = file.includes(`${path.sep}pages${path.sep}`)
     const title = titleFor(file, baseName)
     const storyPath = path.join(path.dirname(file), `${baseName}.stories.jsx`)
@@ -201,7 +209,7 @@ async function main() {
     try {
       await fs.access(storyPath)
     } catch {
-      const story = storyTemplate({ baseName, importPath, defaultExportName, namedComponents, isModalLike, isPage, title })
+      const story = storyTemplate({ baseName, importPath, defaultExportName, namedComponents, isModalLike, visibilityProp, isPage, isOverlay, title })
       await fs.writeFile(storyPath, story)
       storiesWritten++
     }

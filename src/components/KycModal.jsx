@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { UserSquare2 } from 'lucide-react';
+import BaseModal from './BaseModal';
 
 export default function KycModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,14 +25,7 @@ export default function KycModal() {
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[10000]"
-        >
+    <BaseModal isOpen={isOpen} onClose={() => setIsOpen(false)} closeOnBackdrop={false} backdrop="bg-black/80 backdrop-blur-sm">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -73,8 +67,6 @@ export default function KycModal() {
               KYC Pass
             </Button>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    </BaseModal>
   );
 }

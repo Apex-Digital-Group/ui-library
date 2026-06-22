@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { X, Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Share2, UserPlus } from 'lucide-react';
+import BaseModal from './BaseModal';
 
 export default function PostDetailModal({ isOpen, onClose, post }) {
   const [liked, setLiked] = useState(false);
@@ -14,7 +15,7 @@ export default function PostDetailModal({ isOpen, onClose, post }) {
     { id: 5, username: 'luna_luxe', text: 'Can\'t wait for the live stream!', timestamp: '20m', avatar: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68f5a0cfe97e644ca7434f9b/46e088356_3f464eaf5c4d35e56e57b3dd94e05aea_erotic_576x324.jpeg' },
   ]);
 
-  if (!isOpen || !post) return null;
+  if (!post) return null;
 
   const handleAddComment = () => {
     if (!newComment.trim()) return;
@@ -29,14 +30,7 @@ export default function PostDetailModal({ isOpen, onClose, post }) {
   };
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 bg-black/90 z-[10000] flex items-center justify-center p-4"
-      >
+    <BaseModal isOpen={isOpen} onClose={onClose} backdrop="bg-black/90">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-full transition-colors z-10"
@@ -187,7 +181,6 @@ export default function PostDetailModal({ isOpen, onClose, post }) {
             </div>
           </div>
         </motion.div>
-      </motion.div>
-    </AnimatePresence>
+    </BaseModal>
   );
 }

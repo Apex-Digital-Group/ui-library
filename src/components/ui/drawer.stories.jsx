@@ -5,7 +5,7 @@ import {
 } from './drawer'
 import { Button } from './button'
 
-export default { title: 'UI/Drawer', component: Drawer, tags: ['autodocs'], parameters: { layout: 'centered' } }
+export default { title: 'UI/Drawer', component: Drawer, tags: ['autodocs'], parameters: { layout: 'fullscreen' } }
 
 export const Default = {
   render: () => (

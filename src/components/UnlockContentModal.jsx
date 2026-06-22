@@ -1,19 +1,13 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { X, Lock, Sparkles } from 'lucide-react';
+import BaseModal from './BaseModal';
 
 export default function UnlockContentModal({ isOpen, onClose, post }) {
-  if (!isOpen || !post) return null;
+  if (!post) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[10000] flex items-center justify-center p-4"
-      >
+    <BaseModal isOpen={isOpen} onClose={onClose} backdrop="bg-black/80 backdrop-blur-sm">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -88,7 +82,6 @@ export default function UnlockContentModal({ isOpen, onClose, post }) {
             </p>
           </div>
         </motion.div>
-      </motion.div>
-    </AnimatePresence>
+    </BaseModal>
   );
 }

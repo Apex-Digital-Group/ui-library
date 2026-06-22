@@ -4,7 +4,7 @@ import PromotionPanel from './PromotionPanel'
 export default {
   title: 'Components/PromotionPanel',
   component: PromotionPanel,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],
 }
 

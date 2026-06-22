@@ -4,7 +4,7 @@ import CancelLeaveModal from './CancelLeaveModal'
 export default {
   title: 'Components/CancelLeaveModal',
   component: CancelLeaveModal,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],
 }
 

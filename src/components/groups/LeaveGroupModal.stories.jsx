@@ -4,7 +4,7 @@ import LeaveGroupModal from './LeaveGroupModal'
 export default {
   title: 'Components/LeaveGroupModal',
   component: LeaveGroupModal,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],
 }
 

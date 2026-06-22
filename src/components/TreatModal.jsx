@@ -1,22 +1,12 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import BaseModal from './BaseModal';
 
 export default function TreatModal({ isOpen, onClose, modelName, modelImage, modelVideo, userBalance = 10.00 }) {
   const [selectedAmount, setSelectedAmount] = useState('1');
   const [customAmount, setCustomAmount] = useState('');
   const [message, setMessage] = useState('');
-
-  React.useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
 
   const handleSendTreat = () => {
     const amount = selectedAmount === 'other' ? customAmount : selectedAmount;
@@ -24,18 +14,8 @@ export default function TreatModal({ isOpen, onClose, modelName, modelImage, mod
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[10000] flex items-center justify-center p-4"
-        style={{ margin: 0 }}
-      >
+    <BaseModal isOpen={isOpen} onClose={onClose} lockScroll backdrop="bg-black/80 backdrop-blur-sm">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -153,7 +133,6 @@ export default function TreatModal({ isOpen, onClose, modelName, modelImage, mod
             </div>
           </div>
         </motion.div>
-      </motion.div>
-    </AnimatePresence>
+    </BaseModal>
   );
 }

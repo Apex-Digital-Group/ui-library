@@ -4,12 +4,12 @@ import VoodooShopModal from './VoodooShopModal'
 export default {
   title: 'Components/VoodooShopModal',
   component: VoodooShopModal,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],
 }
 
 export const Default = {
   name: 'VoodooShopModal',
   render: (args) => <VoodooShopModal {...args} />,
-  args: { open: true, onOpenChange: () => {}, onClose: () => {} },
+  args: { isOpen: true, onOpenChange: () => {}, onClose: () => {} },
 }

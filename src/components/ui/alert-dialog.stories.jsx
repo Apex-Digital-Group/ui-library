@@ -6,7 +6,7 @@ import {
 } from './alert-dialog'
 import { Button } from './button'
 
-export default { title: 'UI/AlertDialog', component: AlertDialog, tags: ['autodocs'], parameters: { layout: 'centered' } }
+export default { title: 'UI/AlertDialog', component: AlertDialog, tags: ['autodocs'], parameters: { layout: 'fullscreen' } }
 
 export const Default = {
   render: () => (

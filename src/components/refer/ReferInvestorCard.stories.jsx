@@ -4,7 +4,7 @@ import ReferInvestorCard from './ReferInvestorCard'
 export default {
   title: 'Components/ReferInvestorCard',
   component: ReferInvestorCard,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],
 }
 

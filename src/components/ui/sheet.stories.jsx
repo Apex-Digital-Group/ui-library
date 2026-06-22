@@ -7,7 +7,7 @@ import { Button } from './button'
 import { Input } from './input'
 import { Label } from './label'
 
-export default { title: 'UI/Sheet', component: Sheet, tags: ['autodocs'], parameters: { layout: 'centered' } }
+export default { title: 'UI/Sheet', component: Sheet, tags: ['autodocs'], parameters: { layout: 'fullscreen' } }
 
 export const Default = {
   render: () => (
