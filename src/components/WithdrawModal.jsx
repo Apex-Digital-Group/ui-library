@@ -4,43 +4,48 @@ import { X, Clock, Zap, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BaseModal from './BaseModal';
 
-export default function WithdrawModal({ isOpen, onClose, amount }) {
-  const [selectedOption, setSelectedOption] = useState(null);
+const DEFAULT_OPTIONS = [
+  {
+    id: 'standard',
+    title: 'Not in a hurry?',
+    subtitle: 'Seven working days',
+    fee: 'FREE',
+    feePercent: 0,
+    color: 'bg-gray-500 hover:bg-gray-600',
+    icon: Clock
+  },
+  {
+    id: 'express',
+    title: 'Payment next working day.',
+    subtitle: 'Next working day payment',
+    fee: '5%',
+    feePercent: 5,
+    color: 'bg-amber-500 hover:bg-amber-600',
+    icon: Zap
+  },
+  {
+    id: 'instant',
+    title: 'Payment within 30 minutes.',
+    subtitle: 'Premier Payment',
+    fee: '10%',
+    feePercent: 10,
+    color: 'bg-emerald-500 hover:bg-emerald-600',
+    icon: Rocket
+  }
+];
 
-  const options = [
-    {
-      id: 'standard',
-      title: 'Not in a hurry?',
-      subtitle: 'Seven working days',
-      fee: 'FREE',
-      feePercent: 0,
-      color: 'bg-gray-500 hover:bg-gray-600',
-      icon: Clock
-    },
-    {
-      id: 'express',
-      title: 'Payment next working day.',
-      subtitle: 'Next working day payment',
-      fee: '5%',
-      feePercent: 5,
-      color: 'bg-amber-500 hover:bg-amber-600',
-      icon: Zap
-    },
-    {
-      id: 'instant',
-      title: 'Payment within 30 minutes.',
-      subtitle: 'Premier Payment',
-      fee: '10%',
-      feePercent: 10,
-      color: 'bg-emerald-500 hover:bg-emerald-600',
-      icon: Rocket
-    }
-  ];
+export default function WithdrawModal({ isOpen, onClose, amount, options = DEFAULT_OPTIONS, onWithdraw }) {
+  const [selectedOption, setSelectedOption] = useState(null);
 
   const handleProceed = () => {
     if (selectedOption) {
-      // Handle withdrawal logic here
-      console.log('Processing withdrawal with option:', selectedOption);
+      const option = options.find((o) => o.id === selectedOption);
+      if (onWithdraw) {
+        onWithdraw({ amount, option, optionId: selectedOption });
+      } else {
+        // Handle withdrawal logic here
+        console.log('Processing withdrawal with option:', selectedOption);
+      }
       onClose();
     }
   };

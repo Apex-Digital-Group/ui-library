@@ -3,7 +3,12 @@ import { motion } from 'framer-motion';
 import { X, Video, User } from 'lucide-react';
 import BaseModal from './BaseModal';
 
-export default function SignInModal({ isOpen, onClose }) {
+const DEFAULT_OPTIONS = [
+  { type: 'creator', icon: Video, title: 'Content Creator', description: 'Stream, create content & earn' },
+  { type: 'member', icon: User, title: 'Member', description: 'Watch, interact & support creators' },
+];
+
+export default function SignInModal({ isOpen, onClose, options = DEFAULT_OPTIONS, onSelectType }) {
   const [step, setStep] = useState('select'); // 'select' or 'login'
   const [userType, setUserType] = useState(null);
   const [username, setUsername] = useState('');
@@ -20,6 +25,7 @@ export default function SignInModal({ isOpen, onClose }) {
   }, [isOpen]);
 
   const handleSelectType = (type) => {
+    if (onSelectType) onSelectType(type);
     setUserType(type);
     setStep('login');
     if (type === 'creator') {
@@ -62,35 +68,26 @@ export default function SignInModal({ isOpen, onClose }) {
               </div>
 
               <div className="space-y-4">
-                <button
-                  onClick={() => handleSelectType('creator')}
-                  className="w-full p-6 bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/30 hover:to-pink-600/30 border border-purple-500/30 hover:border-purple-500/50 rounded-xl transition-all group"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
-                      <Video className="w-7 h-7 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="text-xl font-bold text-white group-hover:text-pink-400 transition-colors">Content Creator</h3>
-                      <p className="text-sm text-white/60">Stream, create content & earn</p>
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => handleSelectType('member')}
-                  className="w-full p-6 bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/30 hover:to-pink-600/30 border border-purple-500/30 hover:border-purple-500/50 rounded-xl transition-all group"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
-                      <User className="w-7 h-7 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="text-xl font-bold text-white group-hover:text-pink-400 transition-colors">Member</h3>
-                      <p className="text-sm text-white/60">Watch, interact & support creators</p>
-                    </div>
-                  </div>
-                </button>
+                {options.map((option) => {
+                  const Icon = option.icon;
+                  return (
+                    <button
+                      key={option.type}
+                      onClick={() => handleSelectType(option.type)}
+                      className="w-full p-6 bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/30 hover:to-pink-600/30 border border-purple-500/30 hover:border-purple-500/50 rounded-xl transition-all group"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
+                          {Icon && <Icon className="w-7 h-7 text-white" />}
+                        </div>
+                        <div className="text-left">
+                          <h3 className="text-xl font-bold text-white group-hover:text-pink-400 transition-colors">{option.title}</h3>
+                          <p className="text-sm text-white/60">{option.description}</p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ) : (

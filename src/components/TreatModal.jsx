@@ -3,14 +3,24 @@ import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import BaseModal from './BaseModal';
 
-export default function TreatModal({ isOpen, onClose, modelName, modelImage, modelVideo, userBalance = 10.00 }) {
+const DEFAULT_TREAT_AMOUNTS = [
+  { value: '1', label: '1 Credit' },
+  { value: '5', label: '5 Credits' },
+  { value: 'other', label: 'Other' },
+];
+
+export default function TreatModal({ isOpen, onClose, modelName, modelImage, modelVideo, userBalance = 10.00, treatAmounts = DEFAULT_TREAT_AMOUNTS, onTreat }) {
   const [selectedAmount, setSelectedAmount] = useState('1');
   const [customAmount, setCustomAmount] = useState('');
   const [message, setMessage] = useState('');
 
   const handleSendTreat = () => {
     const amount = selectedAmount === 'other' ? customAmount : selectedAmount;
-    console.log('Sending treat:', { amount, message, to: modelName });
+    if (onTreat) {
+      onTreat({ amount, message, to: modelName });
+    } else {
+      console.log('Sending treat:', { amount, message, to: modelName });
+    }
     onClose();
   };
 
@@ -58,36 +68,19 @@ export default function TreatModal({ isOpen, onClose, modelName, modelImage, mod
             <div className="mb-6">
               <label className="block text-lg font-semibold text-white mb-4">Select Amount</label>
               <div className="grid grid-cols-3 gap-4">
-                <button
-                  onClick={() => setSelectedAmount('1')}
-                  className={`py-4 px-4 rounded-xl border-2 font-semibold transition-all ${
-                    selectedAmount === '1'
-                      ? 'border-purple-500 bg-purple-500/20 text-white shadow-lg shadow-purple-500/50'
-                      : 'border-white/20 bg-white/5 text-white/80 hover:border-purple-400 hover:bg-white/10'
-                  }`}
-                >
-                  1 Credit
-                </button>
-                <button
-                  onClick={() => setSelectedAmount('5')}
-                  className={`py-4 px-4 rounded-xl border-2 font-semibold transition-all ${
-                    selectedAmount === '5'
-                      ? 'border-purple-500 bg-purple-500/20 text-white shadow-lg shadow-purple-500/50'
-                      : 'border-white/20 bg-white/5 text-white/80 hover:border-purple-400 hover:bg-white/10'
-                  }`}
-                >
-                  5 Credits
-                </button>
-                <button
-                  onClick={() => setSelectedAmount('other')}
-                  className={`py-4 px-4 rounded-xl border-2 font-semibold transition-all ${
-                    selectedAmount === 'other'
-                      ? 'border-purple-500 bg-purple-500/20 text-white shadow-lg shadow-purple-500/50'
-                      : 'border-white/20 bg-white/5 text-white/80 hover:border-purple-400 hover:bg-white/10'
-                  }`}
-                >
-                  Other
-                </button>
+                {treatAmounts.map((amount) => (
+                  <button
+                    key={amount.value}
+                    onClick={() => setSelectedAmount(amount.value)}
+                    className={`py-4 px-4 rounded-xl border-2 font-semibold transition-all ${
+                      selectedAmount === amount.value
+                        ? 'border-purple-500 bg-purple-500/20 text-white shadow-lg shadow-purple-500/50'
+                        : 'border-white/20 bg-white/5 text-white/80 hover:border-purple-400 hover:bg-white/10'
+                    }`}
+                  >
+                    {amount.label}
+                  </button>
+                ))}
               </div>
               {selectedAmount === 'other' && (
                 <input

@@ -40,7 +40,12 @@ const PACKAGES = [
   { credits: 500, price: 499.99 },
 ];
 
-export default function CreditsModal({ isOpen, onClose }) {
+export default function CreditsModal({
+  isOpen,
+  onClose,
+  packages = PACKAGES,
+  onPurchase,
+}) {
   const [selectedAmount, setSelectedAmount] = React.useState(null);
   const [paymentMethod, setPaymentMethod] = React.useState(null);
   const [sliderValue, setSliderValue] = React.useState(20);
@@ -65,7 +70,11 @@ export default function CreditsModal({ isOpen, onClose }) {
   };
 
   const handlePayment = () => {
-    alert('Payment successful! Credits added to your account.');
+    if (onPurchase) {
+      onPurchase({ credits: selectedAmount.credits, price: selectedAmount.price, paymentMethod });
+    } else {
+      alert('Payment successful! Credits added to your account.');
+    }
     onClose();
   };
 
@@ -126,7 +135,7 @@ export default function CreditsModal({ isOpen, onClose }) {
                 <div>
                   <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">Choose a package</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                    {PACKAGES.map((pkg) => (
+                    {packages.map((pkg) => (
                       <button
                         key={pkg.credits}
                         onClick={() => setSelectedAmount(pkg)}

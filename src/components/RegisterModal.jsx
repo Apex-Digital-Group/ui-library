@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
 
-export default function RegisterModal({ isOpen, onClose, userType = 'member' }) {
+export default function RegisterModal({ isOpen, onClose, userType = 'member', onRegister }) {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -24,19 +24,23 @@ export default function RegisterModal({ isOpen, onClose, userType = 'member' }) 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    localStorage.setItem('user_registered', 'true');
-    
-    // Send email notification to admin
-    try {
-      await base44.integrations.Core.SendEmail({
-        to: 'am@bondmedia.co.uk',
-        subject: 'New Account Pending Approval - Live Gemini',
-        body: `A new ${userType === 'creator' ? 'Content Creator' : 'Member'} account has been created and requires approval.\n\nUsername: ${formData.username}\nEmail: ${formData.email}\nType: ${userType === 'creator' ? 'Content Creator' : 'Member'}\n\nPlease review and approve this account in the admin panel.`
-      });
-    } catch (error) {
-      console.error('Failed to send email notification:', error);
+    if (onRegister) {
+      onRegister({ ...formData, userType });
+    } else {
+      localStorage.setItem('user_registered', 'true');
+
+      // Send email notification to admin
+      try {
+        await base44.integrations.Core.SendEmail({
+          to: 'am@bondmedia.co.uk',
+          subject: 'New Account Pending Approval - Live Gemini',
+          body: `A new ${userType === 'creator' ? 'Content Creator' : 'Member'} account has been created and requires approval.\n\nUsername: ${formData.username}\nEmail: ${formData.email}\nType: ${userType === 'creator' ? 'Content Creator' : 'Member'}\n\nPlease review and approve this account in the admin panel.`
+        });
+      } catch (error) {
+        console.error('Failed to send email notification:', error);
+      }
     }
-    
+
     setStep('confirm');
   };
 
