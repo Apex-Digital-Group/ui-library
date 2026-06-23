@@ -8,6 +8,7 @@
   "exports": {
     ".": "./src/index.js",
     "./story/StoryCard": "./src/components/story/StoryCard.jsx",
+    "./feed/PostCard": "./src/components/feed/PostCard.jsx",
     "./styles.css": "./src/styles.css",
     "./typography.css": "./src/typography.css",
     "./tailwind-preset": "./tailwind.preset.js"

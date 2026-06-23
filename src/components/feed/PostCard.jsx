@@ -1,248 +1,248 @@
-import React, { useState } from 'react';
-import { MessageCircle, Share2, ThumbsUp, MoreHorizontal } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef, useState } from "react";
+import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Lock } from "lucide-react";
+import "./PostCard.css";
 
-const reactionEmojis = [
-  { id: 'like', label: '👍', color: 'hover:scale-125' },
-  { id: 'love', label: '❤️', color: 'hover:scale-125' },
-  { id: 'happy', label: '😊', color: 'hover:scale-125' },
-  { id: 'kiss', label: '😘', color: 'hover:scale-125' },
-  { id: 'thinking', label: '🤔', color: 'hover:scale-125' },
-  { id: 'angry', label: '😠', color: 'hover:scale-125' }
-];
+// 6 reactions, 1:1 with the host (like/love/haha/wow/sad/angry).
+const REACTION_EMOJI = { like: "👍", love: "❤️", haha: "😂", wow: "😮", sad: "😢", angry: "😠" };
+const REACTION_ORDER = ["like", "love", "haha", "wow", "sad", "angry"];
 
-export default function PostCard({ post }) {
-  const [showReactions, setShowReactions] = useState(false);
-  const [selectedReaction, setSelectedReaction] = useState(null);
-  const [likesCount, setLikesCount] = useState(Math.floor(Math.random() * 500) + 50);
-  const [commentsCount, setCommentsCount] = useState(Math.floor(Math.random() * 50) + 5);
-  const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState([
-    { id: 1, author: 'Fan123', text: 'Amazing! 😍', timestamp: '1h ago' },
-    { id: 2, author: 'Viewer456', text: 'So beautiful! ✨', timestamp: '2h ago' }
-  ]);
-  const [newComment, setNewComment] = useState('');
-  const [imageIndex, setImageIndex] = useState(0);
+/**
+ * base44 PostCard — Instagram-style feed card matching base44's Feed page:
+ * solid card, square media, icon-only action row (heart/comment/send/bookmark),
+ * "Liked by … and N others", inline caption, "View all N comments", borderless
+ * add-comment. Presentational: all host logic arrives via callbacks/slots.
+ *
+ * Self-contained styling (scoped CSS). Peer deps: react, lucide-react.
+ */
+export default function PostCard({
+  author = {},
+  timeText,
+  caption,
+  interests = [],
+  onInterestClick,
+  pinned = false,
+  media = [],
+  onOpenMedia,
+  locked = {},
+  liked = false,
+  currentReaction = null,
+  onToggleLike,
+  onReact,
+  likesText,
+  onOpenLikes,
+  comments = {},
+  share = {},
+  shareSlot,
+  saved = false,
+  onToggleSave,
+  menuItems = [],
+  extraContent,
+  onAuthorClick,
+  onCardClick,
+  className = "",
+}) {
+  const [showPicker, setShowPicker] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [mediaIndex, setMediaIndex] = useState(0);
+  const menuRef = useRef(null);
 
-  const handleReaction = (reactionId) => {
-    if (selectedReaction === reactionId) {
-      setSelectedReaction(null);
-      setLikesCount(prev => prev - 1);
-    } else {
-      if (!selectedReaction) {
-        setLikesCount(prev => prev + 1);
-      }
-      setSelectedReaction(reactionId);
-    }
-    setShowReactions(false);
-  };
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const onDoc = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false); };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [menuOpen]);
 
-  const handleAddComment = (e) => {
-    e.preventDefault();
-    if (newComment.trim()) {
-      setComments([{ id: Date.now(), author: 'You', text: newComment, timestamp: 'Just now' }, ...comments]);
-      setNewComment('');
-      setCommentsCount(prev => prev + 1);
-    }
-  };
+  const isGallery = media.length > 1;
+  const item = media[isGallery ? mediaIndex : 0] || media[0];
+  const stop = (e) => e.stopPropagation();
 
-  const handleShare = () => {
-    alert('Share functionality would open a share dialog here!');
-  };
-
-  const isGallery = post.images.length > 1;
+  const pickReaction = (name) => { onReact ? onReact(name) : onToggleLike && onToggleLike(); setShowPicker(false); };
+  const submit = (e) => { e.preventDefault(); if ((comments.value || "").trim()) comments.onSubmit && comments.onSubmit(); };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-[#2E2249]/50 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/10 hover:border-purple-500/30 transition-all group"
-    >
-      {/* Post Header */}
-      <div className="p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <img 
-            src={post.authorImage} 
-            alt={post.author}
-            className="w-10 h-10 rounded-full object-cover border-2 border-purple-500"
-          />
-          <div>
-            <h3 className="font-semibold text-white">{post.author}</h3>
-            <p className="text-xs text-white/60">{post.timestamp}</p>
+    <article className={`bond-post-card ${className}`} onClick={onCardClick}>
+      {/* Header */}
+      <div className="bond-post-card__header">
+        <div className="bond-post-card__author">
+          {author.picture ? (
+            <img className="bond-post-card__avatar" src={author.picture} alt={author.name || "user"}
+              onClick={(e) => { stop(e); onAuthorClick && onAuthorClick(e); }} />
+          ) : null}
+          <div className="bond-post-card__name-row">
+            <span className="bond-post-card__name" onClick={(e) => { stop(e); onAuthorClick && onAuthorClick(e); }}>
+              {author.name}
+            </span>
+            {author.verified ? (
+              <svg className="bond-post-card__verified" viewBox="0 0 24 24" fill="currentColor" aria-label="verified">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+              </svg>
+            ) : null}
+            {author.feeling ? <span className="bond-post-card__feeling">is feeling {author.feeling}</span> : null}
+            {timeText ? <span className="bond-post-card__time">• {timeText}</span> : null}
           </div>
         </div>
-        <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-          <MoreHorizontal className="w-5 h-5 text-white/60" />
-        </button>
+
+        {menuItems.length > 0 ? (
+          <div className="bond-post-card__menu" ref={menuRef}>
+            <button type="button" className="bond-post-card__icon-btn" aria-label="Post menu"
+              onClick={(e) => { stop(e); setMenuOpen((v) => !v); }}>
+              <MoreHorizontal size={20} />
+            </button>
+            {menuOpen ? (
+              <div className="bond-post-card__menu-list" onClick={stop}>
+                {menuItems.map((m) => (
+                  <button key={m.key} type="button" className="bond-post-card__menu-item"
+                    onClick={(e) => { stop(e); setMenuOpen(false); m.onClick && m.onClick(e); }}>
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
-      {/* Post Content */}
-      {post.content && (
-        <div className="px-4 pb-3">
-          <p className="text-white/90 text-sm">{post.content}</p>
-        </div>
-      )}
+      {pinned ? <div className="bond-post-card__pinned">📌 Pinned</div> : null}
 
-      {/* Post Images */}
-      <div className="relative">
-        {isGallery ? (
-          <div className="relative">
-            <img 
-              src={post.images[imageIndex]} 
-              alt={`Post by ${post.author}`}
-              className="w-full h-auto object-cover"
-            />
-            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
-              {post.images.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setImageIndex(idx)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    idx === imageIndex ? 'bg-white w-6' : 'bg-white/50'
-                  }`}
-                />
+      {/* Host-rendered exotic blocks (shared content, age-gate) */}
+      {extraContent}
+
+      {/* Media (square) */}
+      {item ? (
+        <div className={`bond-post-card__media ${locked.isLocked ? "bond-post-card__media--blur" : ""}`}>
+          {item.type === "video" ? (
+            <video src={item.url} autoPlay muted loop playsInline
+              onClick={(e) => { stop(e); onOpenMedia && onOpenMedia(isGallery ? mediaIndex : 0); }} />
+          ) : (
+            <img src={item.url} alt="post media"
+              onClick={(e) => { stop(e); onOpenMedia && onOpenMedia(isGallery ? mediaIndex : 0); }} />
+          )}
+
+          {locked.isLocked ? (
+            <div className="bond-post-card__locked" onClick={(e) => { stop(e); locked.onUnlock && locked.onUnlock(); }}>
+              <div className="bond-post-card__lock-icon"><Lock size={32} /></div>
+              <span className="bond-post-card__lock-title">Premium Content</span>
+              <span className="bond-post-card__lock-sub">Tap to unlock{locked.priceText ? ` • ${locked.priceText}` : ""}</span>
+            </div>
+          ) : null}
+
+          {isGallery && !locked.isLocked ? (
+            <div className="bond-post-card__dots">
+              {media.map((_, i) => (
+                <button key={i} type="button" aria-label={`Media ${i + 1}`}
+                  className={`bond-post-card__dot ${i === mediaIndex ? "bond-post-card__dot--active" : ""}`}
+                  onClick={(e) => { stop(e); setMediaIndex(i); }} />
               ))}
             </div>
-            <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
-              {imageIndex + 1} / {post.images.length}
-            </div>
-          </div>
-        ) : (
-          <img 
-            src={post.images[0]} 
-            alt={`Post by ${post.author}`}
-            className="w-full h-auto object-cover"
-          />
-        )}
-      </div>
-
-      {/* Reactions Bar */}
-      <div className="px-4 py-3 border-t border-white/10">
-        <div className="flex items-center justify-between text-sm text-white/60 mb-3">
-          <span>{likesCount} reactions</span>
-          <div className="flex items-center gap-3">
-            <button onClick={() => setShowComments(!showComments)} className="hover:text-white transition-colors">
-              {commentsCount} comments
-            </button>
-          </div>
+          ) : null}
         </div>
+      ) : null}
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
-            <button 
-              onMouseEnter={() => setShowReactions(true)}
-              onMouseLeave={() => setShowReactions(false)}
-              onClick={() => !selectedReaction && handleReaction('like')}
-              className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                selectedReaction 
-                  ? 'bg-purple-600/20 text-purple-400' 
-                  : 'hover:bg-white/5 text-white/70 hover:text-white'
-              }`}
+      {/* Body */}
+      <div className="bond-post-card__body" onClick={stop}>
+        <div className="bond-post-card__actions-row">
+          <div className="bond-post-card__actions-left">
+            <div
+              style={{ position: "relative", display: "inline-flex" }}
+              onMouseEnter={() => onReact && setShowPicker(true)}
+              onMouseLeave={() => setShowPicker(false)}
             >
-              {selectedReaction ? (
-                <>
-                  <span className="text-lg">{reactionEmojis.find(r => r.id === selectedReaction)?.label}</span>
-                  <span className="text-sm font-medium capitalize">
-                    {reactionEmojis.find(r => r.id === selectedReaction)?.id}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <ThumbsUp className="w-5 h-5" />
-                  <span className="text-sm font-medium">Like</span>
-                </>
-              )}
-            </button>
-
-            {/* Reaction Picker */}
-            <AnimatePresence>
-              {showReactions && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  onMouseEnter={() => setShowReactions(true)}
-                  onMouseLeave={() => setShowReactions(false)}
-                  className="absolute bottom-full left-0 mb-2 bg-[#1a0e2e] border border-white/20 rounded-full px-3 py-2 flex items-center gap-2 shadow-2xl z-10"
-                >
-                  {reactionEmojis.map((reaction) => (
-                    <button
-                      key={reaction.id}
-                      onClick={() => handleReaction(reaction.id)}
-                      className="text-2xl hover:scale-125 transition-transform"
-                      title={reaction.id}
-                    >
-                      {reaction.label}
+              <button
+                type="button"
+                aria-label="Like"
+                className={`bond-post-card__action-icon ${liked || currentReaction ? "bond-post-card__action-icon--liked" : ""}`}
+                onClick={(e) => { stop(e); onToggleLike ? onToggleLike() : pickReaction("like"); }}
+              >
+                {currentReaction && currentReaction !== "like" ? (
+                  <span style={{ fontSize: 22, lineHeight: 1 }}>{REACTION_EMOJI[currentReaction]}</span>
+                ) : (
+                  <Heart size={24} />
+                )}
+              </button>
+              {showPicker && onReact ? (
+                <div className="bond-post-card__picker" onClick={stop}>
+                  {REACTION_ORDER.map((name) => (
+                    <button key={name} type="button" title={name} className="bond-post-card__picker-btn"
+                      onClick={(e) => { stop(e); pickReaction(name); }}>
+                      {REACTION_EMOJI[name]}
                     </button>
                   ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <button 
-            onClick={() => setShowComments(!showComments)}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-all text-white/70 hover:text-white"
-          >
-            <MessageCircle className="w-5 h-5" />
-            <span className="text-sm font-medium">Comment</span>
-          </button>
-
-          <button 
-            onClick={handleShare}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-all text-white/70 hover:text-white"
-          >
-            <Share2 className="w-5 h-5" />
-            <span className="text-sm font-medium">Share</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Comments Section */}
-      <AnimatePresence>
-        {showComments && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="border-t border-white/10 overflow-hidden"
-          >
-            <div className="p-4 space-y-3 max-h-64 overflow-y-auto">
-              {comments.map((comment) => (
-                <div key={comment.id} className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0" />
-                  <div className="flex-1 bg-white/5 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-semibold text-sm text-white">{comment.author}</span>
-                      <span className="text-xs text-white/40">{comment.timestamp}</span>
-                    </div>
-                    <p className="text-sm text-white/80">{comment.text}</p>
-                  </div>
                 </div>
-              ))}
+              ) : null}
             </div>
 
-            {/* Add Comment */}
-            <form onSubmit={handleAddComment} className="p-4 border-t border-white/10 flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0" />
-              <input
-                type="text"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Write a comment..."
-                className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-full text-sm font-medium transition-all"
-              >
-                Post
+            <button type="button" aria-label="Comment" className="bond-post-card__action-icon"
+              onClick={(e) => { stop(e); comments.onToggle && comments.onToggle(); }}>
+              <MessageCircle size={24} />
+            </button>
+
+            {shareSlot ? (
+              <span className="bond-post-card__action-icon">{shareSlot}</span>
+            ) : (
+              <button type="button" aria-label="Share" className="bond-post-card__action-icon"
+                onClick={(e) => { stop(e); share.onShare && share.onShare(e); }}>
+                <Send size={24} />
               </button>
-            </form>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+            )}
+          </div>
+
+          {onToggleSave ? (
+            <button type="button" aria-label="Save"
+              className={`bond-post-card__action-icon ${saved ? "bond-post-card__action-icon--saved" : ""}`}
+              onClick={(e) => { stop(e); onToggleSave(); }}>
+              <Bookmark size={24} />
+            </button>
+          ) : null}
+        </div>
+
+        {likesText ? (
+          <div className="bond-post-card__likes">
+            <button type="button" className="bond-post-card__likes-btn" onClick={(e) => { stop(e); onOpenLikes && onOpenLikes(); }}>
+              {likesText}
+            </button>
+          </div>
+        ) : null}
+
+        {interests.length > 0 ? (
+          <div className="bond-post-card__interests">
+            {interests.map((it) => (
+              <span key={it.id} className="bond-post-card__interest"
+                onClick={(e) => { stop(e); onInterestClick && onInterestClick(it, e); }}>
+                {it.name}
+              </span>
+            ))}
+          </div>
+        ) : null}
+
+        {caption ? (
+          <div className="bond-post-card__caption">
+            {author.name ? <span className="bond-post-card__strong">{author.name} </span> : null}
+            <span>{caption}</span>
+          </div>
+        ) : null}
+
+        {comments.count > 0 || comments.visible ? (
+          <button type="button" className="bond-post-card__comments-link"
+            onClick={(e) => { stop(e); comments.onToggle && comments.onToggle(); }}>
+            {comments.visible ? "Hide comments" : `View all ${comments.count || 0} comments`}
+          </button>
+        ) : null}
+
+        {comments.visible ? <div className="bond-post-card__comments-list">{comments.listSlot}</div> : null}
+
+        {comments.canComment ? (
+          <form className="bond-post-card__comment-form" onSubmit={submit}>
+            <input type="text" className="bond-post-card__comment-input" placeholder="Add a comment..."
+              value={comments.value || ""} onChange={(e) => comments.onChange && comments.onChange(e.target.value)} />
+            {(comments.value || "").trim() ? (
+              <button type="submit" className="bond-post-card__comment-post">Post</button>
+            ) : null}
+          </form>
+        ) : null}
+      </div>
+    </article>
   );
 }
+
+export { PostCard };
