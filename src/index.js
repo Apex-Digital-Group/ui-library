@@ -165,6 +165,9 @@ export {
   mockActivityHistory,
 } from './lib/groupsMockData'
 
+// story
+export { StoryCard } from './components/story/StoryCard'
+
 // react-query client instance (apps can re-use the same defaults as base44)
 export { queryClientInstance } from './lib/query-client'
 
