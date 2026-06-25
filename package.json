@@ -9,6 +9,9 @@
     ".": "./src/index.js",
     "./story/StoryCard": "./src/components/story/StoryCard.jsx",
     "./feed/PostCard": "./src/components/feed/PostCard.jsx",
+    "./feed/SuggestedForYou": "./src/components/feed/SuggestedForYou.jsx",
+    "./feed/LeftNav": "./src/components/feed/LeftNav.jsx",
+    "./feed/SearchModal": "./src/components/feed/SearchModal.jsx",
     "./styles.css": "./src/styles.css",
     "./typography.css": "./src/typography.css",
     "./tailwind-preset": "./tailwind.preset.js"

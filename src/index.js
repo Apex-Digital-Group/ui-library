@@ -60,6 +60,9 @@ export * from './components/ui/tooltip'
 
 // domain
 export { default as PostCard } from './components/feed/PostCard'
+export { default as SuggestedForYou } from './components/feed/SuggestedForYou'
+export { default as LeftNav } from './components/feed/LeftNav'
+export { default as SearchModal } from './components/feed/SearchModal'
 
 export { default as VideoCard } from './components/videos/VideoCard'
 export { default as FilterSidebar } from './components/videos/FilterSidebar'
