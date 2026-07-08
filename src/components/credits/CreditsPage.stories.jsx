@@ -13,17 +13,12 @@ export default {
   },
 };
 
-// Standalone page — no title bar, no back arrow (app shell owns the header).
+// Pure composition — no title bar; the app shell owns the header.
 export const Default = {};
 
-// Opt into the built-in "Credits" title bar.
-export const WithHeader = {
-  args: { showHeader: true },
-};
-
-// Title bar + a back arrow (nested in a flow).
-export const WithHeaderAndBack = {
-  args: { showHeader: true, onBack: () => {} },
+// Hide the footer note entirely.
+export const NoFooterNote = {
+  args: { footerNote: null },
 };
 
 export const WithTopUps = {

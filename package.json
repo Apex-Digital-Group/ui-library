@@ -20,6 +20,7 @@
     "./credits/PurchaseHistory": "./src/components/credits/PurchaseHistory.jsx",
     "./credits/CreditFilters": "./src/components/credits/CreditFilters.jsx",
     "./credits/TransactionCard": "./src/components/credits/TransactionCard.jsx",
+    "./credits/CreditInfoNote": "./src/components/credits/CreditInfoNote.jsx",
     "./styles.css": "./src/styles.css",
     "./typography.css": "./src/typography.css",
     "./tailwind-preset": "./tailwind.preset.js"

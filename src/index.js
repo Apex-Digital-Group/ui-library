@@ -73,6 +73,7 @@ export { default as CreditStatCard } from './components/credits/CreditStatCard'
 export { default as PurchaseHistory, defaultCreditTransactions } from './components/credits/PurchaseHistory'
 export { default as CreditFilters, defaultCreditFilters } from './components/credits/CreditFilters'
 export { default as TransactionCard, TRANSACTION_TYPE_META } from './components/credits/TransactionCard'
+export { default as CreditInfoNote } from './components/credits/CreditInfoNote'
 
 export { default as VideoCard } from './components/videos/VideoCard'
 export { default as FilterSidebar } from './components/videos/FilterSidebar'
