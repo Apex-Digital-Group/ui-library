@@ -1,5 +1,5 @@
-/* Purchase / spending history — filters + list. Rows are TransactionCard.
-   Self-contained, host-agnostic (no Tailwind). */
+/* Purchase / spending history — title + list. Filters are CreditFilters, rows
+   are TransactionCard. Self-contained, host-agnostic (no Tailwind). */
 
 .bond-credit-history { width: 100%; color: #fff; font: inherit; }
 
@@ -9,40 +9,8 @@
   font-weight: 700;
 }
 
-.bond-credit-history__filters {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-  margin-bottom: 16px;
-  scrollbar-width: none;
-}
-.bond-credit-history__filters::-webkit-scrollbar { display: none; }
-
-.bond-credit-history__chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.6);
-  font: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.bond-credit-history__chip:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
-.bond-credit-history__chip.is-active {
-  border-color: transparent;
-  color: #fff;
-  background: linear-gradient(90deg, #9333ea, #db2777);
-  box-shadow: 0 10px 15px -3px rgba(168, 85, 247, 0.2);
-}
-.bond-credit-history__chip-icon { width: 16px; height: 16px; }
+/* spacing when the filter bar sits inside the history block */
+.bond-credit-history__filters { margin-bottom: 16px; }
 
 .bond-credit-history__list { display: flex; flex-direction: column; gap: 8px; }
 

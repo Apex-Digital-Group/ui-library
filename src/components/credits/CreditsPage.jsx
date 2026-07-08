@@ -34,7 +34,8 @@ function deriveStats(transactions) {
  * The "Buy Credits" button fires `onBuyCredits` — route it to your BuyCreditsPage.
  *
  * @param {object} props
- * @param {string} [props.title='Credits'] Header title.
+ * @param {boolean} [props.showHeader=false] Render the built-in "Credits" title bar. Off by default — a standalone page lets the app shell own the header.
+ * @param {string} [props.title='Credits'] Header title (only shown when showHeader).
  * @param {number} [props.balance=277.99] Credit balance.
  * @param {string} [props.creditLabel='credits']
  * @param {Array}  [props.transactions] Ledger rows (see PurchaseHistory).
@@ -53,6 +54,7 @@ function deriveStats(transactions) {
  * @param {string} [props.className]
  */
 export default function CreditsPage({
+  showHeader = false,
   title = "Credits",
   balance = 277.99,
   creditLabel = "credits",
@@ -80,26 +82,29 @@ export default function CreditsPage({
 
   return (
     <div className={`bond-credits-page ${className}`.trim()}>
-      <header className="bond-credits-page__header">
-        <div className="bond-credits-page__header-inner">
-          {/* Back control is opt-in — a standalone page shows no back arrow.
-              Pass onBack (or backHref) only if the page is nested in a flow. */}
-          {onBack && (
-            <button type="button" className="bond-credits-page__back" onClick={onBack} aria-label="Back">
-              <ArrowLeft className="bond-credits-page__back-icon" aria-hidden="true" />
-            </button>
-          )}
-          {!onBack && backHref && (
-            <a href={backHref} className="bond-credits-page__back" aria-label="Back">
-              <ArrowLeft className="bond-credits-page__back-icon" aria-hidden="true" />
-            </a>
-          )}
-          <div className="bond-credits-page__brand">
-            <Coins className="bond-credits-page__brand-icon" aria-hidden="true" />
-            <h1 className="bond-credits-page__brand-title">{title}</h1>
+      {/* The title bar is opt-in — a standalone page lets the app shell own the
+          header. Pass showHeader to render the built-in "Credits" bar; pass
+          onBack (or backHref) to add a back arrow to it. */}
+      {showHeader && (
+        <header className="bond-credits-page__header">
+          <div className="bond-credits-page__header-inner">
+            {onBack && (
+              <button type="button" className="bond-credits-page__back" onClick={onBack} aria-label="Back">
+                <ArrowLeft className="bond-credits-page__back-icon" aria-hidden="true" />
+              </button>
+            )}
+            {!onBack && backHref && (
+              <a href={backHref} className="bond-credits-page__back" aria-label="Back">
+                <ArrowLeft className="bond-credits-page__back-icon" aria-hidden="true" />
+              </a>
+            )}
+            <div className="bond-credits-page__brand">
+              <Coins className="bond-credits-page__brand-icon" aria-hidden="true" />
+              <h1 className="bond-credits-page__brand-title">{title}</h1>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       <main className={`bond-credits-page__main${maxWidth ? " is-bounded" : ""}`} style={mainStyle}>
         <CreditBalanceCard

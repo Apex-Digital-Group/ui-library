@@ -13,12 +13,17 @@ export default {
   },
 };
 
-// Standalone page — no back arrow.
+// Standalone page — no title bar, no back arrow (app shell owns the header).
 export const Default = {};
 
-// Nested in a flow — pass onBack to opt into a back arrow.
-export const WithBackButton = {
-  args: { onBack: () => {} },
+// Opt into the built-in "Credits" title bar.
+export const WithHeader = {
+  args: { showHeader: true },
+};
+
+// Title bar + a back arrow (nested in a flow).
+export const WithHeaderAndBack = {
+  args: { showHeader: true, onBack: () => {} },
 };
 
 export const WithTopUps = {
