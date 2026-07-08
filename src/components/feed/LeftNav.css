@@ -1,0 +1,109 @@
+/* base44 left navigation rail — self-contained, host-agnostic (no Tailwind). */
+
+.bond-leftnav {
+  width: 100%;
+  color: #fff;
+  font: inherit;
+}
+
+.bond-leftnav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bond-leftnav__item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.bond-leftnav__item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.bond-leftnav__item:focus-visible {
+  outline: 2px solid #8b45ff;
+  outline-offset: 2px;
+}
+
+.bond-leftnav__item.is-active {
+  color: #fff;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.bond-leftnav__item.is-disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.bond-leftnav__item.is-disabled:hover {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Inert anchors (menu items with no destination yet) shouldn't look clickable. */
+.bond-leftnav a.bond-leftnav__item[aria-disabled="true"] {
+  cursor: default;
+}
+.bond-leftnav a.bond-leftnav__item[aria-disabled="true"]:hover {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.bond-leftnav__icon {
+  position: relative;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bond-leftnav__icon svg {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+
+.bond-leftnav__badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  background: #ef4444; /* red-500 */
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.bond-leftnav__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
