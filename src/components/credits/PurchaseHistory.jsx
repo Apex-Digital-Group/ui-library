@@ -1,15 +1,14 @@
 import React from "react";
+import { cn } from "../../lib/utils";
 import CreditFilters, { defaultCreditFilters } from "./CreditFilters";
 import TransactionCard, { TRANSACTION_TYPE_META } from "./TransactionCard";
-import "./PurchaseHistory.css";
 
-// Re-exported for back-compat: `import { defaultCreditFilters } from '@bond/lib/credits/PurchaseHistory'`.
+// Re-exported for back-compat.
 export { defaultCreditFilters } from "./CreditFilters";
 
 const defaultFormat = (n) => Number(n || 0).toFixed(2);
 
-/** Default sample ledger so the component renders standalone in Storybook.
- * Icon / label / colour are derived from `type` via TransactionCard. */
+/** Default sample ledger; icon/label/colour derive from `type` via TransactionCard. */
 export const defaultCreditTransactions = [
   { id: 1, type: "tip", creator: "Ahri", amount: 15, date: "2026-07-08 11:42" },
   { id: 2, type: "live_cam", creator: "Sassy Sarah", amount: 45, date: "2026-07-08 10:15" },
@@ -19,23 +18,16 @@ export const defaultCreditTransactions = [
 ];
 
 /**
- * Purchase / spending history — a {@link CreditFilters} bar over a list of
- * {@link TransactionCard} rows. Uncontrolled (internal filter state) or
- * controlled (`activeFilter` + `onFilterChange`). Host-agnostic scoped CSS.
+ * Purchase / spending history — {@link CreditFilters} over {@link TransactionCard}
+ * rows. Uncontrolled or controlled (`activeFilter`+`onFilterChange`). Tailwind.
  *
  * @param {object} props
  * @param {string} [props.title='Purchase History']
- * @param {Array} [props.transactions] See TransactionCard for the item shape.
- * @param {Array} [props.filters] Filter tabs `{ key, label, icon? }`; `all` shows everything.
- * @param {object} [props.typeMeta] type → `{ label, icon, color }` passed to each row.
- * @param {string} [props.activeFilter] Controlled active key (omit for uncontrolled).
- * @param {string} [props.defaultFilter='all'] Initial key when uncontrolled.
- * @param {(key:string)=>void} [props.onFilterChange]
- * @param {(tx:object)=>void} [props.onTransactionClick]
- * @param {(n:number)=>string} [props.formatAmount]
- * @param {(d:any)=>string} [props.formatDate]
- * @param {string} [props.emptyText] Override the empty-state copy.
- * @param {string} [props.className]
+ * @param {Array} [props.transactions] @param {Array} [props.filters] @param {object} [props.typeMeta]
+ * @param {string} [props.activeFilter] @param {string} [props.defaultFilter='all']
+ * @param {(key:string)=>void} [props.onFilterChange] @param {(tx:object)=>void} [props.onTransactionClick]
+ * @param {(n:number)=>string} [props.formatAmount] @param {(d:any)=>string} [props.formatDate]
+ * @param {string} [props.emptyText] @param {string} [props.className]
  */
 export default function PurchaseHistory({
   title = "Purchase History",
@@ -53,7 +45,6 @@ export default function PurchaseHistory({
 }) {
   const [internal, setInternal] = React.useState(defaultFilter);
   const active = activeFilter != null ? activeFilter : internal;
-
   const setFilter = (key) => {
     if (activeFilter == null) setInternal(key);
     onFilterChange?.(key);
@@ -64,19 +55,11 @@ export default function PurchaseHistory({
   const empty = emptyText ?? `No ${active !== "all" && activeLabel ? activeLabel + " " : ""}purchases yet.`;
 
   return (
-    <div className={`bond-credit-history ${className}`.trim()}>
-      {title ? <h2 className="bond-credit-history__title">{title}</h2> : null}
-
-      <CreditFilters
-        filters={filters}
-        activeFilter={active}
-        onChange={setFilter}
-        ariaLabel={title || "Filter"}
-        className="bond-credit-history__filters"
-      />
-
-      <div className="bond-credit-history__list">
-        {filtered.length === 0 && <div className="bond-credit-history__empty">{empty}</div>}
+    <div className={cn("w-full", className)}>
+      {title ? <h2 className="text-lg font-bold text-white mb-4">{title}</h2> : null}
+      <CreditFilters filters={filters} activeFilter={active} onChange={setFilter} ariaLabel={title || "Filter"} className="mb-4" />
+      <div className="space-y-2">
+        {filtered.length === 0 && <div className="text-center py-12 text-white/40 text-sm">{empty}</div>}
         {filtered.map((tx) => (
           <TransactionCard
             key={tx.id}

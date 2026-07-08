@@ -1,47 +1,36 @@
-import * as React from 'react'
-import CreditsModal from './CreditsModal'
+import * as React from "react";
+import CreditsModal from "./CreditsModal";
 
 export default {
-  title: 'Components/CreditsModal',
+  title: "Modals/CreditsModal",
   component: CreditsModal,
-  parameters: { layout: 'fullscreen' },
-  tags: ['autodocs'],
-  argTypes: {
-    packages: {
-      control: 'object',
-      description: 'Credit packages shown under "Choose a package". Each: { credits, price, popular? }.',
-    },
-    isOpen: { control: 'boolean' },
-    onClose: { action: 'close' },
-    onPurchase: { action: 'purchase', description: 'Called on final payment with { credits, price, paymentMethod }.' },
-  },
-}
+  tags: ["autodocs"],
+  parameters: { layout: "fullscreen" },
+  argTypes: { onPurchase: { action: "purchase" }, onSelectPackage: { action: "select-package" } },
+};
 
-export const Default = {
-  name: 'CreditsModal',
-  render: (args) => <CreditsModal {...args} />,
-  args: {
-    isOpen: true,
-    packages: [
-      { credits: 20, price: 24.99 },
-      { credits: 50, price: 59.99 },
-      { credits: 100, price: 114.99, popular: true },
-      { credits: 200, price: 209.99 },
-      { credits: 500, price: 499.99 },
-    ],
-  },
-}
+/** Click "Get Credits" to open; the ✕, the backdrop, or Esc close it. */
+const Demo = (args) => {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <div style={{ minHeight: "100vh", background: "#1a0e2e", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="px-6 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600"
+      >
+        Get Credits
+      </button>
+      <CreditsModal {...args} isOpen={open} onClose={() => setOpen(false)} />
+    </div>
+  );
+};
 
-/** A different package set proves the list is fully data-driven. */
-export const CustomPackages = {
-  name: 'Custom packages',
-  render: (args) => <CreditsModal {...args} />,
-  args: {
-    isOpen: true,
-    packages: [
-      { credits: 10, price: 9.99 },
-      { credits: 250, price: 199.99, popular: true },
-      { credits: 1000, price: 749.99 },
-    ],
+export const Default = { render: Demo };
+export const OpenByDefault = {
+  render: (args) => {
+    const [open, setOpen] = React.useState(true);
+    return <CreditsModal {...args} isOpen={open} onClose={() => setOpen(false)} />;
   },
-}
+};
+export const CustomLabels = { render: Demo, args: { popularLabel: "HOT DEAL", bestValueLabel: "TOP SAVER" } };

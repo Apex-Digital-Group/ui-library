@@ -1,26 +1,22 @@
 import React from "react";
 import { Sparkles, Plus, TrendingDown, TrendingUp } from "lucide-react";
-import "./CreditBalanceCard.css";
+import { cn } from "../../lib/utils";
 
 const defaultFormat = (n) => Number(n || 0).toFixed(2);
 
 /**
- * Credit balance hero card — the big balance number + a "Buy Credits" CTA and a
- * spent/earned summary pill. Presentational and host-agnostic: all data and the
- * buy action arrive via props; styling is scoped CSS (no Tailwind required).
+ * Credit balance hero card — big balance number + "Buy Credits" CTA + spend/
+ * top-up summary pills. Tailwind.
  *
  * @param {object} props
- * @param {number} [props.balance=0] Current credit balance.
- * @param {string} [props.creditLabel='credits'] Unit label after the number.
- * @param {string} [props.title='Your Credit Balance'] Small heading above the number.
- * @param {number} [props.totalSpent] Total spent — renders a summary pill when set.
- * @param {number} [props.totalPurchased] Optional total topped-up — renders a second pill.
- * @param {string} [props.buyLabel='Buy Credits']
- * @param {() => void} [props.onBuyCredits] Click handler for the CTA (hidden if omitted).
- * @param {(n:number)=>string} [props.formatAmount] Number formatter (default: 2dp).
- * @param {string} [props.spentLabel='Total spent']
- * @param {string} [props.purchasedLabel='Total purchased']
- * @param {string} [props.className] Extra class names on the root.
+ * @param {number} [props.balance=0] @param {string} [props.creditLabel='credits']
+ * @param {string} [props.title='Your Credit Balance']
+ * @param {number} [props.totalSpent] Renders a spent pill when set.
+ * @param {number} [props.totalPurchased] Renders a top-up pill when set.
+ * @param {string} [props.buyLabel='Buy Credits'] @param {() => void} [props.onBuyCredits]
+ * @param {(n:number)=>string} [props.formatAmount]
+ * @param {string} [props.spentLabel='Total spent'] @param {string} [props.purchasedLabel='Total purchased']
+ * @param {string} [props.className]
  */
 export default function CreditBalanceCard({
   balance = 0,
@@ -36,40 +32,36 @@ export default function CreditBalanceCard({
   className = "",
 }) {
   return (
-    <div className={`bond-credit-balance ${className}`.trim()}>
-      <span className="bond-credit-balance__glow bond-credit-balance__glow--a" aria-hidden="true" />
-      <span className="bond-credit-balance__glow bond-credit-balance__glow--b" aria-hidden="true" />
-
-      <div className="bond-credit-balance__inner">
-        <div className="bond-credit-balance__label">
-          <Sparkles className="bond-credit-balance__spark" aria-hidden="true" />
+    <div className={cn("relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600/30 via-[#2E2249] to-[#1a0e2e] border border-purple-500/30 p-6 md:p-8", className)}>
+      <div className="absolute -top-12 -right-12 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl" />
+      <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-pink-500/10 rounded-full blur-3xl" />
+      <div className="relative">
+        <div className="flex items-center gap-2 text-white/60 text-sm mb-2">
+          <Sparkles className="w-4 h-4 text-yellow-400" />
           {title}
         </div>
-
-        <div className="bond-credit-balance__amount">
-          <span className="bond-credit-balance__value">{formatAmount(balance)}</span>
-          <span className="bond-credit-balance__unit">{creditLabel}</span>
+        <div className="flex items-end gap-3 mb-6">
+          <span className="text-5xl md:text-6xl font-extrabold tracking-tight text-white">{formatAmount(balance)}</span>
+          <span className="text-lg text-white/50 mb-2">{creditLabel}</span>
         </div>
-
-        <div className="bond-credit-balance__actions">
+        <div className="flex flex-col sm:flex-row gap-3">
           {onBuyCredits && (
-            <button type="button" className="bond-credit-balance__buy" onClick={onBuyCredits}>
-              <Plus className="bond-credit-balance__buy-icon" aria-hidden="true" />
+            <button type="button" onClick={onBuyCredits}
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6 py-3 rounded-xl font-semibold text-white transition-all shadow-lg shadow-purple-500/20">
+              <Plus className="w-5 h-5" />
               {buyLabel}
             </button>
           )}
-
           {totalPurchased != null && (
-            <div className="bond-credit-balance__pill">
-              <TrendingUp className="bond-credit-balance__pill-icon bond-credit-balance__pill-icon--up" aria-hidden="true" />
-              <span>{purchasedLabel}: <strong>{formatAmount(totalPurchased)} {creditLabel}</strong></span>
+            <div className="flex items-center gap-2 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white/60">
+              <TrendingUp className="w-4 h-4 text-green-400" />
+              <span>{purchasedLabel}: <span className="text-white font-semibold">{formatAmount(totalPurchased)} {creditLabel}</span></span>
             </div>
           )}
-
           {totalSpent != null && (
-            <div className="bond-credit-balance__pill">
-              <TrendingDown className="bond-credit-balance__pill-icon bond-credit-balance__pill-icon--down" aria-hidden="true" />
-              <span>{spentLabel}: <strong>{formatAmount(totalSpent)} {creditLabel}</strong></span>
+            <div className="flex items-center gap-2 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white/60">
+              <TrendingDown className="w-4 h-4 text-red-400" />
+              <span>{spentLabel}: <span className="text-white font-semibold">{formatAmount(totalSpent)} {creditLabel}</span></span>
             </div>
           )}
         </div>

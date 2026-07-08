@@ -1,13 +1,11 @@
 import React from "react";
 import { Image, Video, Camera, Heart, Coins } from "lucide-react";
-import "./TransactionCard.css";
+import { cn } from "../../lib/utils";
+import { creditChip } from "./creditColors";
 
 const defaultFormat = (n) => Number(n || 0).toFixed(2);
 
-/**
- * type → display meta (label + icon + colour). Override via the `typeMeta` prop
- * to add or relabel transaction types.
- */
+/** type → display meta (label + icon + colour). Override via `typeMeta`. */
 export const TRANSACTION_TYPE_META = {
   tip: { label: "Tip Purchase", icon: Heart, color: "pink" },
   live_cam: { label: "Live Cam Purchase", icon: Camera, color: "red" },
@@ -16,23 +14,18 @@ export const TRANSACTION_TYPE_META = {
   topup: { label: "Top-up", icon: Coins, color: "green" },
 };
 
-const titleCase = (s) =>
-  String(s || "").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+const titleCase = (s) => String(s || "").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 /**
  * A single credit transaction card — icon chip, creator/title, type label, and
- * a signed amount + date. Type meta (label/icon/colour) is derived from
- * `transaction.type` via `typeMeta`, but any field on the transaction overrides
- * it. Host-agnostic scoped CSS.
+ * a signed amount + date. Meta derives from `transaction.type`; per-item fields
+ * override. Tailwind.
  *
  * @param {object} props
  * @param {object} props.transaction `{ id, type, creator, amount, date, direction?, icon?, color?, label?, subtitle? }`.
- *   `direction` ∈ 'out'(default)|'in' sets the −/+ sign + colour. `icon`/`color`/`label`
- *   override the derived type meta.
- * @param {object} [props.typeMeta=TRANSACTION_TYPE_META] type → `{ label, icon, color }`.
- * @param {(tx:object)=>void} [props.onClick] Makes the card clickable (pointer + keyboard).
- * @param {(n:number)=>string} [props.formatAmount] Amount formatter (default: 2dp).
- * @param {(d:any)=>string} [props.formatDate] Date formatter (default: as-is).
+ * @param {object} [props.typeMeta=TRANSACTION_TYPE_META]
+ * @param {(tx:object)=>void} [props.onClick] Makes the card clickable.
+ * @param {(n:number)=>string} [props.formatAmount] @param {(d:any)=>string} [props.formatDate]
  * @param {string} [props.className]
  */
 export default function TransactionCard({
@@ -46,35 +39,35 @@ export default function TransactionCard({
   const tx = transaction || {};
   const meta = typeMeta[tx.type] || {};
   const Icon = tx.icon || meta.icon;
-  const color = tx.color || meta.color || "purple";
+  const c = creditChip(tx.color || meta.color || "purple");
   const label = tx.label || meta.label || `${titleCase(tx.type)} Purchase`;
   const incoming = tx.direction === "in";
   const clickable = typeof onClick === "function";
 
   return (
     <div
-      className={`bond-txn-card bond-txn-card--${color}${clickable ? " is-clickable" : ""} ${className}`.trim()}
+      className={cn(
+        "flex items-center gap-4 p-3 md:p-4 rounded-xl bg-white/5 border border-white/10 transition-colors",
+        clickable && "cursor-pointer hover:bg-white/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-purple-500/60",
+        className,
+      )}
       onClick={clickable ? () => onClick(tx) : undefined}
       role={clickable ? "button" : undefined}
       tabIndex={clickable ? 0 : undefined}
-      onKeyDown={
-        clickable
-          ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(tx); } }
-          : undefined
-      }
+      onKeyDown={clickable ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(tx); } } : undefined}
     >
-      <div className="bond-txn-card__icon">
-        {Icon ? <Icon className="bond-txn-card__glyph" aria-hidden="true" /> : null}
+      <div className={cn("w-11 h-11 rounded-xl ring-1 flex items-center justify-center flex-shrink-0", c.bg, c.ring)}>
+        {Icon ? <Icon className={cn("w-5 h-5", c.text)} /> : null}
       </div>
-      <div className="bond-txn-card__main">
-        <div className="bond-txn-card__creator">{tx.creator}</div>
-        <div className="bond-txn-card__type">{tx.subtitle || label}</div>
+      <div className="flex-1 min-w-0">
+        <div className="font-medium text-sm truncate text-white">{tx.creator}</div>
+        <div className="text-xs text-white/40 capitalize">{tx.subtitle || label}</div>
       </div>
-      <div className="bond-txn-card__meta">
-        <div className={`bond-txn-card__amount${incoming ? " is-in" : " is-out"}`}>
+      <div className="text-right flex-shrink-0">
+        <div className={cn("font-bold text-sm", incoming ? "text-green-400" : "text-red-400")}>
           {incoming ? "+" : "−"}{formatAmount(tx.amount)}
         </div>
-        {tx.date != null && <div className="bond-txn-card__date">{formatDate(tx.date)}</div>}
+        {tx.date != null && <div className="text-[10px] text-white/35">{formatDate(tx.date)}</div>}
       </div>
     </div>
   );

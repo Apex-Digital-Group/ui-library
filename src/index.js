@@ -67,6 +67,8 @@ export { default as SearchModal } from './components/feed/SearchModal'
 // credits — full-width page + composable sub-components (all parameterized)
 export { default as CreditsPage } from './components/credits/CreditsPage'
 export { default as BuyCreditsPage, defaultPackages, defaultPricingAnchors, defaultPaymentMethods, priceForCredits } from './components/credits/BuyCreditsPage'
+export { default as BuyCreditsFlow } from './components/credits/BuyCreditsFlow'
+export { default as CreditPackageCard, resolvePackageBadge } from './components/credits/CreditPackageCard'
 export { default as CreditBalanceCard } from './components/credits/CreditBalanceCard'
 export { default as CreditStatsGrid, defaultCreditStats } from './components/credits/CreditStatsGrid'
 export { default as CreditStatCard } from './components/credits/CreditStatCard'

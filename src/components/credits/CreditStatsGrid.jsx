@@ -1,7 +1,7 @@
 import React from "react";
 import { Image, Video, Camera, Heart } from "lucide-react";
+import { cn } from "../../lib/utils";
 import CreditStatCard from "./CreditStatCard";
-import "./CreditStatsGrid.css";
 
 const defaultFormat = (n) => Number(n || 0).toFixed(2);
 
@@ -14,13 +14,11 @@ export const defaultCreditStats = [
 ];
 
 /**
- * Responsive grid of spend-by-category stat cards. Each item renders a
- * {@link CreditStatCard}. Fully data-driven; host-agnostic scoped CSS.
+ * Responsive grid of spend-by-category cards ({@link CreditStatCard}). Tailwind.
  *
  * @param {object} props
- * @param {Array} [props.stats] Items: `{ key, label, amount, icon?, color? }`.
- * @param {string} [props.suffix='spent'] Trailing word under each amount.
- * @param {(n:number)=>string} [props.formatAmount] Number formatter (default: 2dp).
+ * @param {Array} [props.stats] `{ key, label, amount, icon?, color? }`.
+ * @param {string} [props.suffix='spent'] @param {(n:number)=>string} [props.formatAmount]
  * @param {string} [props.className]
  */
 export default function CreditStatsGrid({
@@ -30,7 +28,7 @@ export default function CreditStatsGrid({
   className = "",
 }) {
   return (
-    <div className={`bond-credit-stats ${className}`.trim()}>
+    <div className={cn("grid grid-cols-2 lg:grid-cols-4 gap-3", className)}>
       {stats.map((s) => (
         <CreditStatCard
           key={s.key || s.label}

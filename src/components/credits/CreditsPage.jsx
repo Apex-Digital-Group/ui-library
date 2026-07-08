@@ -1,10 +1,10 @@
 import React from "react";
 import { Image, Video, Camera, Heart } from "lucide-react";
+import { cn } from "../../lib/utils";
 import CreditBalanceCard from "./CreditBalanceCard";
 import CreditStatsGrid, { defaultCreditStats } from "./CreditStatsGrid";
 import PurchaseHistory, { defaultCreditFilters, defaultCreditTransactions } from "./PurchaseHistory";
 import CreditInfoNote from "./CreditInfoNote";
-import "./CreditsPage.css";
 
 const defaultFormat = (n) => Number(n || 0).toFixed(2);
 
@@ -19,7 +19,7 @@ const CATEGORY_META = {
 function deriveStats(transactions) {
   const totals = {};
   transactions.forEach((t) => {
-    if (t.direction === "in") return; // only spends
+    if (t.direction === "in") return;
     totals[t.type] = (totals[t.type] || 0) + Number(t.amount || 0);
   });
   return Object.keys(CATEGORY_META)
@@ -29,26 +29,19 @@ function deriveStats(transactions) {
 
 /**
  * Full-width Credits page — a pure composition of library pieces:
- * CreditBalanceCard + CreditStatsGrid (CreditStatCard) + PurchaseHistory
- * (CreditFilters + TransactionCard) + CreditInfoNote. No built-in title bar —
- * the host app owns the page header. Fully parameterized; host-agnostic scoped CSS.
+ * CreditBalanceCard + CreditStatsGrid + PurchaseHistory + CreditInfoNote. No
+ * built-in title bar (the host app owns the header). Fully parameterized. Tailwind.
  *
- * The "Buy Credits" button fires `onBuyCredits` — route it to your BuyCreditsPage.
+ * The "Buy Credits" button fires `onBuyCredits` — route it to your buy modal/page.
  *
  * @param {object} props
- * @param {number} [props.balance=277.99] Credit balance.
- * @param {string} [props.creditLabel='credits']
- * @param {Array}  [props.transactions] Ledger rows (see PurchaseHistory).
- * @param {Array}  [props.stats] Spend cards; derived from `transactions` when omitted.
- * @param {Array}  [props.filters] History filter tabs.
- * @param {number} [props.totalSpent] Override; defaults to the sum of spend rows.
- * @param {number} [props.totalPurchased] Optional top-up total for a second pill.
- * @param {() => void} [props.onBuyCredits] CTA handler (navigate to the buy page).
- * @param {(tx:object)=>void} [props.onTransactionClick]
- * @param {(n:number)=>string} [props.formatAmount]
- * @param {(d:any)=>string} [props.formatDate]
- * @param {React.ReactNode} [props.footerNote] Replaces the default CreditInfoNote. Pass null to hide the note entirely.
- * @param {number|string} [props.maxWidth] Optional content max-width (e.g. 1024). Full-width by default.
+ * @param {number} [props.balance=277.99] @param {string} [props.creditLabel='credits']
+ * @param {Array} [props.transactions] @param {Array} [props.stats] @param {Array} [props.filters]
+ * @param {number} [props.totalSpent] @param {number} [props.totalPurchased]
+ * @param {() => void} [props.onBuyCredits] @param {(tx:object)=>void} [props.onTransactionClick]
+ * @param {(n:number)=>string} [props.formatAmount] @param {(d:any)=>string} [props.formatDate]
+ * @param {React.ReactNode} [props.footerNote] Replaces the default note; null hides it.
+ * @param {number|string} [props.maxWidth] Optional content max-width. Full-width by default.
  * @param {string} [props.className]
  */
 export default function CreditsPage({
@@ -75,8 +68,8 @@ export default function CreditsPage({
   const mainStyle = maxWidth ? { maxWidth: typeof maxWidth === "number" ? `${maxWidth}px` : maxWidth } : undefined;
 
   return (
-    <div className={`bond-credits-page ${className}`.trim()}>
-      <main className={`bond-credits-page__main${maxWidth ? " is-bounded" : ""}`} style={mainStyle}>
+    <div className={cn("w-full min-h-screen bg-[#1a0e2e] text-white", className)}>
+      <main className={cn("w-full px-4 md:px-6 py-6 md:py-8 space-y-6", maxWidth && "mx-auto")} style={mainStyle}>
         <CreditBalanceCard
           balance={balance}
           creditLabel={creditLabel}
@@ -85,9 +78,7 @@ export default function CreditsPage({
           onBuyCredits={onBuyCredits}
           formatAmount={formatAmount}
         />
-
         <CreditStatsGrid stats={resolvedStats} formatAmount={formatAmount} />
-
         <PurchaseHistory
           transactions={transactions}
           filters={filters}
@@ -95,7 +86,6 @@ export default function CreditsPage({
           formatAmount={formatAmount}
           formatDate={formatDate}
         />
-
         {footerNote === null ? null : (footerNote ?? <CreditInfoNote />)}
       </main>
     </div>

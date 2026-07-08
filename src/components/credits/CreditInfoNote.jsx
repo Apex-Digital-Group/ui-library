@@ -1,15 +1,14 @@
 import React from "react";
 import { Sparkles } from "lucide-react";
-import "./CreditInfoNote.css";
+import { cn } from "../../lib/utils";
 
 /**
- * Small info blurb — an icon beside a lead-in + body. Reusable for any note
- * ("How Credits Work", disclaimers, tips…). Host-agnostic scoped CSS.
+ * Small info blurb — icon + bold lead-in + body. Reusable for any note. Tailwind.
  *
  * @param {object} props
- * @param {React.ComponentType} [props.icon=Sparkles] Leading icon (pass null to hide).
- * @param {string} [props.title='How Credits Work:'] Bold lead-in (pass "" to hide).
- * @param {React.ReactNode} [props.children] Body text; a default credits blurb renders when omitted.
+ * @param {React.ComponentType} [props.icon=Sparkles] Leading icon (null to hide).
+ * @param {string} [props.title='How Credits Work:'] Bold lead-in ("" to hide).
+ * @param {React.ReactNode} [props.children] Body; default credits blurb when omitted.
  * @param {string} [props.className]
  */
 export default function CreditInfoNote({
@@ -19,10 +18,10 @@ export default function CreditInfoNote({
   className = "",
 }) {
   return (
-    <div className={`bond-credit-note ${className}`.trim()}>
-      {Icon ? <Icon className="bond-credit-note__icon" aria-hidden="true" /> : null}
-      <p className="bond-credit-note__text">
-        {title ? <strong className="bond-credit-note__lead">{title} </strong> : null}
+    <div className={cn("flex items-start gap-3 p-4 bg-white/5 rounded-xl border border-white/10 text-xs text-white/50", className)}>
+      {Icon ? <Icon className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" /> : null}
+      <p className="m-0 leading-relaxed">
+        {title ? <span className="text-white font-semibold">{title} </span> : null}
         {children ??
           "1 credit = $1 of platform value. Use credits to unlock photos, videos, access live cam sessions, and tip your favourite creators."}
       </p>

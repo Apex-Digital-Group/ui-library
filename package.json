@@ -14,6 +14,8 @@
     "./feed/SearchModal": "./src/components/feed/SearchModal.jsx",
     "./credits/CreditsPage": "./src/components/credits/CreditsPage.jsx",
     "./credits/BuyCreditsPage": "./src/components/credits/BuyCreditsPage.jsx",
+    "./credits/BuyCreditsFlow": "./src/components/credits/BuyCreditsFlow.jsx",
+    "./credits/CreditPackageCard": "./src/components/credits/CreditPackageCard.jsx",
     "./credits/CreditBalanceCard": "./src/components/credits/CreditBalanceCard.jsx",
     "./credits/CreditStatsGrid": "./src/components/credits/CreditStatsGrid.jsx",
     "./credits/CreditStatCard": "./src/components/credits/CreditStatCard.jsx",
