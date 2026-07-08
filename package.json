@@ -17,6 +17,7 @@
     "./credits/CreditBalanceCard": "./src/components/credits/CreditBalanceCard.jsx",
     "./credits/CreditStatsGrid": "./src/components/credits/CreditStatsGrid.jsx",
     "./credits/PurchaseHistory": "./src/components/credits/PurchaseHistory.jsx",
+    "./credits/TransactionCard": "./src/components/credits/TransactionCard.jsx",
     "./styles.css": "./src/styles.css",
     "./typography.css": "./src/typography.css",
     "./tailwind-preset": "./tailwind.preset.js"

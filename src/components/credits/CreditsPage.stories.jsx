@@ -8,13 +8,18 @@ export default {
   parameters: { layout: "fullscreen" },
   argTypes: {
     onBuyCredits: { action: "buy-credits" },
-    onBack: { action: "back" },
     onTransactionClick: { action: "transaction-click" },
     balance: { control: "number" },
   },
 };
 
+// Standalone page — no back arrow.
 export const Default = {};
+
+// Nested in a flow — pass onBack to opt into a back arrow.
+export const WithBackButton = {
+  args: { onBack: () => {} },
+};
 
 export const WithTopUps = {
   args: {

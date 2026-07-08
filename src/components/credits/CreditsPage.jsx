@@ -43,8 +43,8 @@ function deriveStats(transactions) {
  * @param {number} [props.totalSpent] Override; defaults to the sum of spend rows.
  * @param {number} [props.totalPurchased] Optional top-up total for a second pill.
  * @param {() => void} [props.onBuyCredits] CTA handler (navigate to the buy page).
- * @param {() => void} [props.onBack] Back-arrow handler (renders a link to `backHref` if omitted).
- * @param {string} [props.backHref='/'] Fallback href for the back arrow.
+ * @param {() => void} [props.onBack] Optional back handler — renders a back arrow only when set.
+ * @param {string} [props.backHref] Optional back link (used only if `onBack` is omitted). No back arrow by default.
  * @param {(tx:object)=>void} [props.onTransactionClick]
  * @param {(n:number)=>string} [props.formatAmount]
  * @param {(d:any)=>string} [props.formatDate]
@@ -63,7 +63,7 @@ export default function CreditsPage({
   totalPurchased,
   onBuyCredits,
   onBack,
-  backHref = "/",
+  backHref,
   onTransactionClick,
   formatAmount = defaultFormat,
   formatDate = (d) => d,
@@ -82,11 +82,14 @@ export default function CreditsPage({
     <div className={`bond-credits-page ${className}`.trim()}>
       <header className="bond-credits-page__header">
         <div className="bond-credits-page__header-inner">
-          {onBack ? (
+          {/* Back control is opt-in — a standalone page shows no back arrow.
+              Pass onBack (or backHref) only if the page is nested in a flow. */}
+          {onBack && (
             <button type="button" className="bond-credits-page__back" onClick={onBack} aria-label="Back">
               <ArrowLeft className="bond-credits-page__back-icon" aria-hidden="true" />
             </button>
-          ) : (
+          )}
+          {!onBack && backHref && (
             <a href={backHref} className="bond-credits-page__back" aria-label="Back">
               <ArrowLeft className="bond-credits-page__back-icon" aria-hidden="true" />
             </a>

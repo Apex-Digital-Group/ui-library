@@ -70,6 +70,7 @@ export { default as BuyCreditsPage, defaultPackages, defaultPricingAnchors, defa
 export { default as CreditBalanceCard } from './components/credits/CreditBalanceCard'
 export { default as CreditStatsGrid, defaultCreditStats } from './components/credits/CreditStatsGrid'
 export { default as PurchaseHistory, defaultCreditFilters, defaultCreditTransactions } from './components/credits/PurchaseHistory'
+export { default as TransactionCard, TRANSACTION_TYPE_META } from './components/credits/TransactionCard'
 
 export { default as VideoCard } from './components/videos/VideoCard'
 export { default as FilterSidebar } from './components/videos/FilterSidebar'

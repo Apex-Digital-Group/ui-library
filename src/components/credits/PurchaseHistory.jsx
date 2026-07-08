@@ -1,5 +1,6 @@
 import React from "react";
 import { Sparkles, Image, Video, Camera, Heart } from "lucide-react";
+import TransactionCard, { TRANSACTION_TYPE_META } from "./TransactionCard";
 import "./PurchaseHistory.css";
 
 const defaultFormat = (n) => Number(n || 0).toFixed(2);
@@ -13,13 +14,14 @@ export const defaultCreditFilters = [
   { key: "tip", label: "Tips", icon: Heart },
 ];
 
-/** Default sample ledger so the component renders standalone in Storybook. */
+/** Default sample ledger so the component renders standalone in Storybook.
+ * Icon / label / colour are derived from `type` via TransactionCard. */
 export const defaultCreditTransactions = [
-  { id: 1, type: "tip", creator: "Ahri", amount: 15, date: "2026-07-08 11:42", icon: Heart, color: "pink" },
-  { id: 2, type: "live_cam", creator: "Sassy Sarah", amount: 45, date: "2026-07-08 10:15", icon: Camera, color: "red" },
-  { id: 3, type: "photo", creator: "Lola Lollipop", amount: 10, date: "2026-07-07 22:30", icon: Image, color: "blue" },
-  { id: 4, type: "video", creator: "Candy Crush", amount: 25, date: "2026-07-07 19:05", icon: Video, color: "purple" },
-  { id: 5, type: "tip", creator: "Vixen Victoria", amount: 5, date: "2026-07-07 18:20", icon: Heart, color: "pink" },
+  { id: 1, type: "tip", creator: "Ahri", amount: 15, date: "2026-07-08 11:42" },
+  { id: 2, type: "live_cam", creator: "Sassy Sarah", amount: 45, date: "2026-07-08 10:15" },
+  { id: 3, type: "photo", creator: "Lola Lollipop", amount: 10, date: "2026-07-07 22:30" },
+  { id: 4, type: "video", creator: "Candy Crush", amount: 25, date: "2026-07-07 19:05" },
+  { id: 5, type: "tip", creator: "Vixen Victoria", amount: 5, date: "2026-07-07 18:20" },
 ];
 
 /**
@@ -45,6 +47,7 @@ export default function PurchaseHistory({
   title = "Purchase History",
   transactions = defaultCreditTransactions,
   filters = defaultCreditFilters,
+  typeMeta = TRANSACTION_TYPE_META,
   activeFilter,
   defaultFilter = "all",
   onFilterChange,
@@ -92,35 +95,16 @@ export default function PurchaseHistory({
 
       <div className="bond-credit-history__list">
         {filtered.length === 0 && <div className="bond-credit-history__empty">{empty}</div>}
-        {filtered.map((tx) => {
-          const Icon = tx.icon;
-          const incoming = tx.direction === "in";
-          const clickable = typeof onTransactionClick === "function";
-          return (
-            <div
-              key={tx.id}
-              className={`bond-credit-history__row bond-credit-color--${tx.color || "purple"}${clickable ? " is-clickable" : ""}`}
-              onClick={clickable ? () => onTransactionClick(tx) : undefined}
-              role={clickable ? "button" : undefined}
-              tabIndex={clickable ? 0 : undefined}
-              onKeyDown={clickable ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onTransactionClick(tx); } } : undefined}
-            >
-              <div className="bond-credit-history__row-icon">
-                {Icon ? <Icon className="bond-credit-history__row-glyph" aria-hidden="true" /> : null}
-              </div>
-              <div className="bond-credit-history__row-main">
-                <div className="bond-credit-history__row-creator">{tx.creator}</div>
-                <div className="bond-credit-history__row-type">{String(tx.type || "").replace(/_/g, " ")} purchase</div>
-              </div>
-              <div className="bond-credit-history__row-meta">
-                <div className={`bond-credit-history__row-amount${incoming ? " is-in" : " is-out"}`}>
-                  {incoming ? "+" : "−"}{formatAmount(tx.amount)}
-                </div>
-                <div className="bond-credit-history__row-date">{formatDate(tx.date)}</div>
-              </div>
-            </div>
-          );
-        })}
+        {filtered.map((tx) => (
+          <TransactionCard
+            key={tx.id}
+            transaction={tx}
+            typeMeta={typeMeta}
+            onClick={onTransactionClick}
+            formatAmount={formatAmount}
+            formatDate={formatDate}
+          />
+        ))}
       </div>
     </div>
   );
