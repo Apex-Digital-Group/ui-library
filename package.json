@@ -12,6 +12,11 @@
     "./feed/SuggestedForYou": "./src/components/feed/SuggestedForYou.jsx",
     "./feed/LeftNav": "./src/components/feed/LeftNav.jsx",
     "./feed/SearchModal": "./src/components/feed/SearchModal.jsx",
+    "./credits/CreditsPage": "./src/components/credits/CreditsPage.jsx",
+    "./credits/BuyCreditsPage": "./src/components/credits/BuyCreditsPage.jsx",
+    "./credits/CreditBalanceCard": "./src/components/credits/CreditBalanceCard.jsx",
+    "./credits/CreditStatsGrid": "./src/components/credits/CreditStatsGrid.jsx",
+    "./credits/PurchaseHistory": "./src/components/credits/PurchaseHistory.jsx",
     "./styles.css": "./src/styles.css",
     "./typography.css": "./src/typography.css",
     "./tailwind-preset": "./tailwind.preset.js"

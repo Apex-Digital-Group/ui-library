@@ -1,0 +1,112 @@
+/* Purchase / spending history — self-contained, host-agnostic (no Tailwind). */
+
+.bond-credit-history { width: 100%; color: #fff; font: inherit; }
+
+.bond-credit-history__title {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.bond-credit-history__filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  scrollbar-width: none;
+}
+.bond-credit-history__filters::-webkit-scrollbar { display: none; }
+
+.bond-credit-history__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.bond-credit-history__chip:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+.bond-credit-history__chip.is-active {
+  border-color: transparent;
+  color: #fff;
+  background: linear-gradient(90deg, #9333ea, #db2777);
+  box-shadow: 0 10px 15px -3px rgba(168, 85, 247, 0.2);
+}
+.bond-credit-history__chip-icon { width: 16px; height: 16px; }
+
+.bond-credit-history__list { display: flex; flex-direction: column; gap: 8px; }
+
+.bond-credit-history__empty {
+  text-align: center;
+  padding: 48px 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.bond-credit-history__row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  transition: background 0.15s ease;
+}
+.bond-credit-history__row.is-clickable { cursor: pointer; }
+.bond-credit-history__row.is-clickable:hover { background: rgba(255, 255, 255, 0.08); }
+.bond-credit-history__row.is-clickable:focus-visible { outline: 2px solid rgba(168, 85, 247, 0.6); outline-offset: 2px; }
+
+.bond-credit-history__row-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 12px;
+}
+.bond-credit-history__row-glyph { width: 20px; height: 20px; }
+
+.bond-credit-history__row-main { flex: 1; min-width: 0; }
+.bond-credit-history__row-creator {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bond-credit-history__row-type {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: capitalize;
+}
+
+.bond-credit-history__row-meta { text-align: right; flex-shrink: 0; }
+.bond-credit-history__row-amount { font-size: 14px; font-weight: 700; }
+.bond-credit-history__row-amount.is-out { color: #f87171; }
+.bond-credit-history__row-amount.is-in { color: #4ade80; }
+.bond-credit-history__row-date { font-size: 10px; color: rgba(255, 255, 255, 0.35); }
+
+/* per-category icon-chip colour (shared token names) */
+.bond-credit-color--pink   .bond-credit-history__row-icon { background: rgba(236, 72, 153, 0.15); box-shadow: inset 0 0 0 1px rgba(236, 72, 153, 0.3); }
+.bond-credit-color--pink   .bond-credit-history__row-glyph { color: #f472b6; }
+.bond-credit-color--red    .bond-credit-history__row-icon { background: rgba(239, 68, 68, 0.15); box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.3); }
+.bond-credit-color--red    .bond-credit-history__row-glyph { color: #f87171; }
+.bond-credit-color--blue   .bond-credit-history__row-icon { background: rgba(59, 130, 246, 0.15); box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.3); }
+.bond-credit-color--blue   .bond-credit-history__row-glyph { color: #60a5fa; }
+.bond-credit-color--purple .bond-credit-history__row-icon { background: rgba(168, 85, 247, 0.15); box-shadow: inset 0 0 0 1px rgba(168, 85, 247, 0.3); }
+.bond-credit-color--purple .bond-credit-history__row-glyph { color: #c084fc; }
+.bond-credit-color--green  .bond-credit-history__row-icon { background: rgba(34, 197, 94, 0.15); box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.3); }
+.bond-credit-color--green  .bond-credit-history__row-glyph { color: #4ade80; }
+.bond-credit-color--yellow .bond-credit-history__row-icon { background: rgba(234, 179, 8, 0.15); box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.3); }
+.bond-credit-color--yellow .bond-credit-history__row-glyph { color: #facc15; }

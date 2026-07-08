@@ -1,0 +1,212 @@
+/* Full-width Buy Credits page — self-contained, host-agnostic (no Tailwind). */
+
+.bond-buy-credits {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2e2249 0%, #1a0e2e 100%);
+  color: #fff;
+  font: inherit;
+}
+
+.bond-buy-credits__header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(46, 34, 73, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+}
+.bond-buy-credits__header-inner { display: flex; align-items: center; gap: 12px; padding: 16px 24px; }
+.bond-buy-credits__back {
+  display: inline-flex; padding: 8px; border: 0; border-radius: 8px;
+  background: transparent; color: #fff; cursor: pointer; transition: background 0.15s ease;
+}
+.bond-buy-credits__back:hover { background: rgba(255, 255, 255, 0.1); }
+.bond-buy-credits__title { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 700; }
+.bond-buy-credits__spark { width: 24px; height: 24px; color: #facc15; }
+.bond-buy-credits__sub { margin: 2px 0 0; font-size: 14px; color: rgba(255, 255, 255, 0.5); }
+
+.bond-buy-credits__main { width: 100%; padding: 24px; }
+.bond-buy-credits__stack { display: flex; flex-direction: column; gap: 24px; }
+.bond-buy-credits__eyebrow {
+  margin: 0 0 16px; font-size: 12px; font-weight: 600; letter-spacing: 0.15em;
+  text-transform: uppercase; color: rgba(255, 255, 255, 0.4);
+}
+
+.bond-buy-credits__icon-12 { width: 12px; height: 12px; }
+.bond-buy-credits__icon-16 { width: 16px; height: 16px; }
+.bond-buy-credits__icon-20 { width: 20px; height: 20px; }
+.bond-buy-credits__icon-24 { width: 24px; height: 24px; }
+
+/* packages grid */
+.bond-buy-credits__packages {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (min-width: 640px) { .bond-buy-credits__packages { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .bond-buy-credits__packages { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+
+.bond-buy-credits__pkg {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 24px 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff; font: inherit; cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+.bond-buy-credits__pkg:hover { transform: scale(1.03); border-color: rgba(192, 132, 252, 0.6); background: rgba(255, 255, 255, 0.1); }
+.bond-buy-credits__pkg.is-popular { border-color: #a855f7; background: rgba(168, 85, 247, 0.1); box-shadow: 0 10px 15px -3px rgba(168, 85, 247, 0.2); }
+.bond-buy-credits__pkg.is-best { border-color: #f59e0b; background: rgba(245, 158, 11, 0.1); box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.2); }
+
+.bond-buy-credits__ribbon {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  padding: 2px 10px; border-radius: 9999px; font-size: 10px; font-weight: 700;
+  white-space: nowrap; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+.bond-buy-credits__ribbon.is-popular { background: linear-gradient(90deg, #9333ea, #db2777); color: #fff; }
+.bond-buy-credits__ribbon.is-best { background: linear-gradient(90deg, #f59e0b, #eab308); color: #000; }
+
+.bond-buy-credits__pkg-name { font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, 0.6); margin-bottom: 4px; }
+.bond-buy-credits__pkg.is-popular .bond-buy-credits__pkg-name { color: #d8b4fe; }
+.bond-buy-credits__pkg.is-best .bond-buy-credits__pkg-name { color: #fcd34d; }
+.bond-buy-credits__pkg-credits { font-size: 30px; font-weight: 700; }
+.bond-buy-credits__pkg.is-popular .bond-buy-credits__pkg-credits { color: #d8b4fe; }
+.bond-buy-credits__pkg.is-best .bond-buy-credits__pkg-credits { color: #fcd34d; }
+.bond-buy-credits__pkg-unit { font-size: 11px; color: rgba(255, 255, 255, 0.5); margin-bottom: 12px; }
+.bond-buy-credits__pkg-price { font-size: 18px; font-weight: 700; }
+.bond-buy-credits__pkg-ppc { font-size: 10px; color: rgba(255, 255, 255, 0.35); margin-top: 4px; }
+
+/* slider */
+.bond-buy-credits__slider-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px; background: rgba(255, 255, 255, 0.05); padding: 24px;
+}
+.bond-buy-credits__slider-top { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
+.bond-buy-credits__slider-credits { font-size: 48px; font-weight: 700; line-height: 1; }
+.bond-buy-credits__slider-unit { font-size: 14px; color: rgba(255, 255, 255, 0.5); margin-top: 4px; }
+.bond-buy-credits__slider-pricewrap { text-align: right; }
+.bond-buy-credits__slider-price { font-size: 36px; font-weight: 700; line-height: 1; color: #d8b4fe; }
+.bond-buy-credits__slider-ppc { font-size: 12px; color: rgba(255, 255, 255, 0.4); margin-top: 4px; }
+
+.bond-buy-credits__hint {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+  padding: 8px 12px; border-radius: 8px; font-size: 12px;
+  color: #4ade80; background: rgba(74, 222, 128, 0.1); border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.bond-buy-credits__range { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 9999px; cursor: pointer; }
+.bond-buy-credits__range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #9333ea; cursor: pointer; border: 2px solid #fff; box-shadow: 0 0 6px rgba(147, 51, 234, 0.6); }
+.bond-buy-credits__range::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #9333ea; cursor: pointer; border: 2px solid #fff; }
+.bond-buy-credits__range-ends { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: rgba(255, 255, 255, 0.25); }
+
+.bond-buy-credits__primary {
+  margin-top: 20px; width: 100%; padding: 12px; border: 0; border-radius: 12px;
+  font: inherit; font-weight: 700; color: #fff; cursor: pointer;
+  background: linear-gradient(90deg, #9333ea, #db2777); transition: filter 0.15s ease;
+}
+.bond-buy-credits__primary:hover { filter: brightness(1.08); }
+
+/* step 2 — summary + methods */
+.bond-buy-credits__summary {
+  text-align: center; padding: 24px; border-radius: 12px;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(219, 39, 119, 0.2));
+}
+.bond-buy-credits__summary-credits { font-size: 48px; font-weight: 700; }
+.bond-buy-credits__summary-unit { color: rgba(255, 255, 255, 0.6); margin-bottom: 12px; }
+.bond-buy-credits__summary-price { font-size: 30px; font-weight: 700; }
+.bond-buy-credits__summary-ppc { font-size: 12px; color: rgba(255, 255, 255, 0.4); margin-top: 4px; }
+
+.bond-buy-credits__method {
+  display: flex; align-items: center; gap: 16px; width: 100%; padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05); color: #fff; font: inherit; cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.bond-buy-credits__method:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(168, 85, 247, 0.5); }
+.bond-buy-credits__method-icon {
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 48px; height: 48px; border-radius: 9999px;
+}
+.bond-buy-credits__method-icon--blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.bond-buy-credits__method-icon--orange { background: linear-gradient(135deg, #f97316, #ea580c); }
+.bond-buy-credits__method-icon--green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.bond-buy-credits__method-text { flex: 1; text-align: left; }
+.bond-buy-credits__method-title { display: block; font-weight: 600; }
+.bond-buy-credits__method-sub { display: block; font-size: 14px; color: rgba(255, 255, 255, 0.5); }
+.bond-buy-credits__method-chevron { width: 20px; height: 20px; color: rgba(255, 255, 255, 0.3); }
+
+/* step 3 — card */
+.bond-buy-credits__receipt {
+  display: flex; align-items: center; justify-content: space-between; padding: 16px;
+  border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 12px;
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(219, 39, 119, 0.2));
+}
+.bond-buy-credits__receipt-right { text-align: right; }
+.bond-buy-credits__receipt-label { font-size: 12px; color: rgba(255, 255, 255, 0.6); }
+.bond-buy-credits__receipt-strong { font-size: 20px; font-weight: 700; }
+.bond-buy-credits__receipt-total { font-size: 24px; font-weight: 700; }
+
+.bond-buy-credits__field { display: block; }
+.bond-buy-credits__field > span { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+.bond-buy-credits__field input {
+  width: 100%; padding: 12px 16px; border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.05);
+  color: #fff; font: inherit; box-sizing: border-box;
+}
+.bond-buy-credits__field input::placeholder { color: rgba(255, 255, 255, 0.3); }
+.bond-buy-credits__field input:focus { outline: none; border-color: #a855f7; }
+.bond-buy-credits__field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.bond-buy-credits__secure {
+  display: flex; align-items: center; gap: 8px; padding: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px;
+  background: rgba(59, 130, 246, 0.1); font-size: 12px; color: rgba(255, 255, 255, 0.6);
+}
+.bond-buy-credits__secure .bond-buy-credits__icon-16 { color: #60a5fa; flex-shrink: 0; }
+
+.bond-buy-credits__pay {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 16px; border: 0; border-radius: 12px;
+  font: inherit; font-size: 18px; font-weight: 700; color: #fff; cursor: pointer;
+  background: linear-gradient(90deg, #16a34a, #22c55e); transition: filter 0.15s ease;
+}
+.bond-buy-credits__pay:hover { filter: brightness(1.08); }
+.bond-buy-credits__pay--orange { background: linear-gradient(90deg, #ea580c, #f97316); }
+.bond-buy-credits__pay--green { background: linear-gradient(90deg, #16a34a, #22c55e); }
+
+/* step 3 — crypto / buycrypto panels */
+.bond-buy-credits__panel { text-align: center; padding: 24px; border-radius: 12px; }
+.bond-buy-credits__panel--orange { border: 1px solid rgba(249, 115, 22, 0.3); background: linear-gradient(135deg, rgba(234, 88, 12, 0.2), rgba(234, 88, 12, 0.1)); }
+.bond-buy-credits__panel--green { border: 1px solid rgba(34, 197, 94, 0.3); background: linear-gradient(135deg, rgba(22, 163, 74, 0.2), rgba(22, 163, 74, 0.1)); }
+.bond-buy-credits__panel-icon { width: 56px; height: 56px; margin: 0 auto 16px; display: block; }
+.bond-buy-credits__panel-icon--orange { color: #fb923c; }
+.bond-buy-credits__panel-icon--green { color: #4ade80; }
+.bond-buy-credits__panel-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+.bond-buy-credits__panel-sub { color: rgba(255, 255, 255, 0.6); margin-bottom: 20px; }
+
+.bond-buy-credits__coins { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+.bond-buy-credits__coin {
+  padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05); color: #fff; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.bond-buy-credits__coin:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(249, 115, 22, 0.5); }
+
+.bond-buy-credits__quote {
+  text-align: left; padding: 16px; margin-bottom: 16px; border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.05);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.bond-buy-credits__quote div { display: flex; justify-content: space-between; }
+.bond-buy-credits__quote span { font-size: 14px; color: rgba(255, 255, 255, 0.6); }
+.bond-buy-credits__quote strong { font-weight: 600; }
+.bond-buy-credits__powered { font-size: 12px; color: rgba(255, 255, 255, 0.4); margin: 16px 0 0; }
+
+@media (max-width: 640px) {
+  .bond-buy-credits__main { padding: 16px; }
+  .bond-buy-credits__field-row { grid-template-columns: 1fr; }
+}

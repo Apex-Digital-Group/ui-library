@@ -64,6 +64,13 @@ export { default as SuggestedForYou } from './components/feed/SuggestedForYou'
 export { default as LeftNav } from './components/feed/LeftNav'
 export { default as SearchModal } from './components/feed/SearchModal'
 
+// credits — full-width page + composable sub-components (all parameterized)
+export { default as CreditsPage } from './components/credits/CreditsPage'
+export { default as BuyCreditsPage, defaultPackages, defaultPricingAnchors, defaultPaymentMethods, priceForCredits } from './components/credits/BuyCreditsPage'
+export { default as CreditBalanceCard } from './components/credits/CreditBalanceCard'
+export { default as CreditStatsGrid, defaultCreditStats } from './components/credits/CreditStatsGrid'
+export { default as PurchaseHistory, defaultCreditFilters, defaultCreditTransactions } from './components/credits/PurchaseHistory'
+
 export { default as VideoCard } from './components/videos/VideoCard'
 export { default as FilterSidebar } from './components/videos/FilterSidebar'
 export { default as PromoCard } from './components/videos/PromoCard'

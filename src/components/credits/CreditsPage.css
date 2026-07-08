@@ -1,0 +1,72 @@
+/* Full-width Credits page — self-contained, host-agnostic (no Tailwind). */
+
+.bond-credits-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #1a0e2e;
+  color: #fff;
+  font: inherit;
+}
+
+.bond-credits-page__header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #2e2249;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.bond-credits-page__header-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+}
+
+.bond-credits-page__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.bond-credits-page__back:hover { background: rgba(255, 255, 255, 0.1); }
+.bond-credits-page__back-icon { width: 20px; height: 20px; }
+
+.bond-credits-page__brand { display: flex; align-items: center; gap: 8px; }
+.bond-credits-page__brand-icon { width: 24px; height: 24px; color: #facc15; }
+.bond-credits-page__brand-title { margin: 0; font-size: 20px; font-weight: 700; }
+
+/* full-width by default; `is-bounded` + inline max-width centres it */
+.bond-credits-page__main {
+  width: 100%;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.bond-credits-page__main.is-bounded { margin: 0 auto; }
+
+.bond-credits-page__note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.bond-credits-page__note p { margin: 0; }
+.bond-credits-page__note strong { color: #fff; font-weight: 600; }
+.bond-credits-page__note-icon { width: 16px; height: 16px; color: #facc15; flex-shrink: 0; margin-top: 2px; }
+
+@media (max-width: 640px) {
+  .bond-credits-page__main { padding: 24px 16px; }
+  .bond-credits-page__header-inner { padding: 16px; }
+}
