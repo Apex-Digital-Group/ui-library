@@ -77,6 +77,14 @@ export { default as CreditFilters, defaultCreditFilters } from './components/cre
 export { default as TransactionCard, TRANSACTION_TYPE_META } from './components/credits/TransactionCard'
 export { default as CreditInfoNote } from './components/credits/CreditInfoNote'
 
+// alerts — LiveGemini themed toasts + sweet alerts (configurable variant/accent/background)
+// Aliased to Gemini* at the barrel to avoid colliding with the shadcn `Toast`
+// primitive; the plain names are available via the @bond/lib/alerts/* subpaths.
+export { default as GeminiToast } from './components/alerts/Toast'
+export { default as GeminiToastStack } from './components/alerts/ToastStack'
+export { default as SweetAlert } from './components/alerts/SweetAlert'
+export { ALERT_VARIANTS } from './components/alerts/alertVariants'
+
 export { default as VideoCard } from './components/videos/VideoCard'
 export { default as FilterSidebar } from './components/videos/FilterSidebar'
 export { default as PromoCard } from './components/videos/PromoCard'
