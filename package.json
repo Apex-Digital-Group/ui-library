@@ -16,6 +16,8 @@
     "./credits/BuyCreditsPage": "./src/components/credits/BuyCreditsPage.jsx",
     "./credits/BuyCreditsFlow": "./src/components/credits/BuyCreditsFlow.jsx",
     "./credits/CreditPackageCard": "./src/components/credits/CreditPackageCard.jsx",
+    "./alerts/AlertProvider": "./src/components/alerts/AlertProvider.jsx",
+    "./alerts/compat": "./src/components/alerts/compat.jsx",
     "./alerts/Toast": "./src/components/alerts/Toast.jsx",
     "./alerts/ToastStack": "./src/components/alerts/ToastStack.jsx",
     "./alerts/SweetAlert": "./src/components/alerts/SweetAlert.jsx",

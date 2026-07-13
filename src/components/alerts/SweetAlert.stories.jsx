@@ -20,7 +20,7 @@ const Demo = (args) => {
   return (
     <div style={{ minHeight: "100vh", background: "#0d0716", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <button type="button" onClick={() => setOpen(true)} style={{ padding: "12px 24px", borderRadius: 12, border: 0, cursor: "pointer", fontWeight: 700, color: "#fff", background: "linear-gradient(90deg,#9333ea,#db2777)" }}>Open alert</button>
-      <SweetAlert {...args} isOpen={open} onClose={() => setOpen(false)} />
+      <SweetAlert {...args} isOpen={open} onConfirm={() => setOpen(false)} onCancel={() => setOpen(false)} onDismiss={() => setOpen(false)} />
     </div>
   );
 };
@@ -33,6 +33,6 @@ export const ConfirmDialog = { render: Demo, args: { variant: "error", title: "D
 export const CustomColours = { render: Demo, args: { variant: "success", title: "Custom theme", message: "accent + background are configurable props.", confirmLabel: "OK", accent: "#ff3d9a", background: "linear-gradient(180deg,#241033,#140a24)" } };
 
 export const OpenByDefault = {
-  render: (args) => { const [o, setO] = React.useState(true); return <SweetAlert {...args} isOpen={o} onClose={() => setO(false)} />; },
+  render: (args) => { const [o, setO] = React.useState(true); const close = () => setO(false); return <SweetAlert {...args} isOpen={o} onConfirm={close} onCancel={close} onDismiss={close} />; },
   args: { variant: "success", title: "Welcome to Live Gemini!", message: "Your account is verified and your feed is ready.", confirmLabel: "Enter feed" },
 };

@@ -83,7 +83,14 @@ export { default as CreditInfoNote } from './components/credits/CreditInfoNote'
 export { default as GeminiToast } from './components/alerts/Toast'
 export { default as GeminiToastStack } from './components/alerts/ToastStack'
 export { default as SweetAlert } from './components/alerts/SweetAlert'
-export { ALERT_VARIANTS } from './components/alerts/alertVariants'
+export { ALERT_VARIANTS, DEFAULT_ALERT_BG } from './components/alerts/alertVariants'
+// imperative runtime: mount <AlertProvider> once, then useToast()/useAlert()
+// (or the `toast`/`alert` singletons anywhere, incl. non-React code).
+// Global background/scheme themeable via the provider props / useAlertTheme().
+export { AlertProvider, useToast, useAlert, useAlertTheme, toast, alert } from './components/alerts/AlertProvider'
+// drop-in adapters for legacy call sites (react-toastify / antd message,
+// notification, Modal.confirm) — see components/alerts/compat.js.
+export { toast as toastCompat, message, notification, modal, confirmModal } from './components/alerts/compat'
 
 export { default as VideoCard } from './components/videos/VideoCard'
 export { default as FilterSidebar } from './components/videos/FilterSidebar'
