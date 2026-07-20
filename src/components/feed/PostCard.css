@@ -276,6 +276,29 @@
   font: inherit;
   cursor: pointer;
 }
+/* aggregated reaction summary — overlapping emoji stack + total count */
+.bond-post-card__likes-btn--reactions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.bond-post-card__react-stack {
+  display: inline-flex;
+  align-items: center;
+}
+.bond-post-card__react-emoji {
+  font-size: 16px;
+  line-height: 1;
+  margin-left: -4px;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.35));
+}
+.bond-post-card__react-emoji:first-child {
+  margin-left: 0;
+}
+.bond-post-card__react-count {
+  font-size: 13px;
+  color: inherit;
+}
 .bond-post-card__muted {
   color: rgba(255, 255, 255, 0.7);
 }
