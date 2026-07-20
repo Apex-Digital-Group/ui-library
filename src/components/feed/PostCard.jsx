@@ -45,6 +45,13 @@ export default function PostCard({
   const [menuOpen, setMenuOpen] = useState(false);
   const [mediaIndex, setMediaIndex] = useState(0);
   const menuRef = useRef(null);
+  // Hover-intent: keep the reaction picker open while the pointer travels from
+  // the like button up to the popup (there's a visual gap between them, so a
+  // bare onMouseLeave would close it before the user can pick an emoji).
+  const pickerHideTimer = useRef(null);
+  useEffect(() => () => clearTimeout(pickerHideTimer.current), []);
+  const openPicker = () => { clearTimeout(pickerHideTimer.current); if (onReact) setShowPicker(true); };
+  const scheduleClosePicker = () => { pickerHideTimer.current = setTimeout(() => setShowPicker(false), 280); };
 
   useEffect(() => {
     if (!menuOpen) return undefined;
@@ -145,8 +152,8 @@ export default function PostCard({
           <div className="bond-post-card__actions-left">
             <div
               style={{ position: "relative", display: "inline-flex" }}
-              onMouseEnter={() => onReact && setShowPicker(true)}
-              onMouseLeave={() => setShowPicker(false)}
+              onMouseEnter={openPicker}
+              onMouseLeave={scheduleClosePicker}
             >
               <button
                 type="button"
