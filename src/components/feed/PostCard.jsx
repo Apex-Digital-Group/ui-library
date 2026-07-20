@@ -29,6 +29,7 @@ export default function PostCard({
   onToggleLike,
   onReact,
   likesText,
+  reactionCounts = {},
   onOpenLikes,
   comments = {},
   share = {},
@@ -45,6 +46,20 @@ export default function PostCard({
   const [menuOpen, setMenuOpen] = useState(false);
   const [mediaIndex, setMediaIndex] = useState(0);
   const menuRef = useRef(null);
+  // Hover-intent: keep the reaction picker open while the pointer travels from
+  // the like button up to the popup (there's a visual gap between them, so a
+  // bare onMouseLeave would close it before the user can pick an emoji).
+  const pickerHideTimer = useRef(null);
+  useEffect(() => () => clearTimeout(pickerHideTimer.current), []);
+  const openPicker = () => { clearTimeout(pickerHideTimer.current); if (onReact) setShowPicker(true); };
+  const scheduleClosePicker = () => { pickerHideTimer.current = setTimeout(() => setShowPicker(false), 280); };
+
+  // Aggregated reactions across all users: the distinct emoji actually used
+  // (👍❤️😂…), most-used first, shown as a stack next to the total count — so a
+  // post reacted to with a mix of types shows that mix, not just "N likes".
+  const reactionEntries = Object.entries(reactionCounts || {}).filter(([name, c]) => c > 0 && REACTION_EMOJI[name]);
+  const reactionTotal = reactionEntries.reduce((sum, [, c]) => sum + c, 0);
+  const topReactionNames = reactionEntries.sort((a, b) => b[1] - a[1]).slice(0, 3).map(([name]) => name);
 
   useEffect(() => {
     if (!menuOpen) return undefined;
@@ -145,8 +160,8 @@ export default function PostCard({
           <div className="bond-post-card__actions-left">
             <div
               style={{ position: "relative", display: "inline-flex" }}
-              onMouseEnter={() => onReact && setShowPicker(true)}
-              onMouseLeave={() => setShowPicker(false)}
+              onMouseEnter={openPicker}
+              onMouseLeave={scheduleClosePicker}
             >
               <button
                 type="button"
@@ -154,8 +169,8 @@ export default function PostCard({
                 className={`bond-post-card__action-icon ${liked || currentReaction ? "bond-post-card__action-icon--liked" : ""}`}
                 onClick={(e) => { stop(e); onToggleLike ? onToggleLike() : pickReaction("like"); }}
               >
-                {currentReaction && currentReaction !== "like" ? (
-                  <span style={{ fontSize: 22, lineHeight: 1 }}>{REACTION_EMOJI[currentReaction]}</span>
+                {currentReaction ? (
+                  <span style={{ fontSize: 22, lineHeight: 1 }}>{REACTION_EMOJI[currentReaction] || REACTION_EMOJI.like}</span>
                 ) : (
                   <Heart size={24} />
                 )}
@@ -196,7 +211,18 @@ export default function PostCard({
           ) : null}
         </div>
 
-        {likesText ? (
+        {topReactionNames.length > 0 ? (
+          <div className="bond-post-card__likes">
+            <button type="button" className="bond-post-card__likes-btn bond-post-card__likes-btn--reactions" onClick={(e) => { stop(e); onOpenLikes && onOpenLikes(); }}>
+              <span className="bond-post-card__react-stack" aria-hidden>
+                {topReactionNames.map((name) => (
+                  <span key={name} className="bond-post-card__react-emoji" title={name}>{REACTION_EMOJI[name]}</span>
+                ))}
+              </span>
+              <span className="bond-post-card__react-count">{reactionTotal}</span>
+            </button>
+          </div>
+        ) : likesText ? (
           <div className="bond-post-card__likes">
             <button type="button" className="bond-post-card__likes-btn" onClick={(e) => { stop(e); onOpenLikes && onOpenLikes(); }}>
               {likesText}
