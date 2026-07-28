@@ -122,8 +122,11 @@ export default function SweetAlert({
               textAlign: "center",
               overflow: "hidden",
               background,
+              // Frosted glass: blur the scrim/app behind when `background` is translucent.
+              backdropFilter: "blur(22px) saturate(140%)",
+              WebkitBackdropFilter: "blur(22px) saturate(140%)",
               border: `1px solid ${tone.border}`,
-              boxShadow: tone.shadow,
+              boxShadow: `${tone.shadow}, inset 0 1px 0 rgba(255,255,255,0.55)`,
               fontFamily: "'Manrope', system-ui, -apple-system, sans-serif",
             }}
           >
