@@ -95,8 +95,12 @@ export default function Toast({
         borderRadius: 16,
         overflow: "hidden",
         background,
+        // Frosted glass: blur whatever's behind the card when `background` is
+        // translucent (harmless/invisible on an opaque background).
+        backdropFilter: "blur(22px) saturate(140%)",
+        WebkitBackdropFilter: "blur(22px) saturate(140%)",
         border: `1px solid ${tone.border}`,
-        boxShadow: tone.shadow,
+        boxShadow: `${tone.shadow}, inset 0 1px 0 rgba(255,255,255,0.55)`,
         fontFamily: "'Manrope', system-ui, -apple-system, sans-serif",
         ...style,
       }}

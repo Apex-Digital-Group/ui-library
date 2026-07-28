@@ -15,7 +15,7 @@ const preview = {
       story: { inline: false, height: '640px' },
     },
     backgrounds: {
-      default: 'app',
+      default: 'dark',
       values: [
         { name: 'app', value: 'hsl(0 0% 100%)' },
         { name: 'dark', value: 'hsl(0 0% 3.9%)' },
@@ -26,7 +26,7 @@ const preview = {
   globalTypes: {
     theme: {
       description: 'Color scheme',
-      defaultValue: 'light',
+      defaultValue: 'dark',
       toolbar: {
         title: 'Theme',
         icon: 'circlehollow',
@@ -37,7 +37,7 @@ const preview = {
   },
   decorators: [
     (Story, ctx) => {
-      const theme = ctx.globals.theme || 'light'
+      const theme = ctx.globals.theme || 'dark'
       if (typeof document !== 'undefined') {
         document.documentElement.classList.toggle('dark', theme === 'dark')
       }

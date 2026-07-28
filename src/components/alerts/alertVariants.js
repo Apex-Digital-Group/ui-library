@@ -17,6 +17,12 @@ export const resolveVariant = (variant, accent, iconOverride) => {
 // Default dark card background (configurable via a `background` prop).
 export const DEFAULT_ALERT_BG = "linear-gradient(180deg,#1b1030 0%,#120a20 100%)";
 
+// "Purple whitish glass" — a translucent light-lavender gradient. Pair with the
+// backdrop-blur the Toast/SweetAlert cards apply so the dark app frosts through
+// (glassmorphism). Light enough that the tone system auto-picks dark text.
+export const GLASS_ALERT_BG =
+  "linear-gradient(150deg, rgba(247,243,255,0.88) 0%, rgba(233,225,250,0.80) 55%, rgba(224,214,247,0.76) 100%)";
+
 // ---------------------------------------------------------------------------
 // Tone / theming — toasts + alerts can sit on a dark OR a light background
 // (e.g. a client setting background="#ffffff"). Text, border and shadow must
