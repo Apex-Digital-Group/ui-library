@@ -30,6 +30,7 @@ export default function PostCard({
   onReact,
   likesText,
   reactionCounts = {},
+  topReactorName,
   onOpenLikes,
   comments = {},
   share = {},
@@ -41,6 +42,7 @@ export default function PostCard({
   onAuthorClick,
   onCardClick,
   className = "",
+  currentUserAvatarUrl,
 }) {
   const [showPicker, setShowPicker] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -57,9 +59,20 @@ export default function PostCard({
   // Aggregated reactions across all users: the distinct emoji actually used
   // (👍❤️😂…), most-used first, shown as a stack next to the total count — so a
   // post reacted to with a mix of types shows that mix, not just "N likes".
+  // Ties (and the summary's left-to-right order generally) follow the same
+  // REACTION_ORDER as the picker, so both stay visually consistent.
   const reactionEntries = Object.entries(reactionCounts || {}).filter(([name, c]) => c > 0 && REACTION_EMOJI[name]);
   const reactionTotal = reactionEntries.reduce((sum, [, c]) => sum + c, 0);
-  const topReactionNames = reactionEntries.sort((a, b) => b[1] - a[1]).slice(0, 3).map(([name]) => name);
+  const orderIndex = (name) => REACTION_ORDER.indexOf(name);
+  let topReactionNames = [...reactionEntries]
+    .sort((a, b) => (b[1] - a[1]) || (orderIndex(a[0]) - orderIndex(b[0])))
+    .slice(0, 3)
+    .map(([name]) => name);
+  // Your own reaction should always be represented in the stack, even if it
+  // didn't make the top 3 by raw count.
+  if (currentReaction && REACTION_EMOJI[currentReaction] && !topReactionNames.includes(currentReaction)) {
+    topReactionNames = [currentReaction, ...topReactionNames].slice(0, 3);
+  }
 
   useEffect(() => {
     if (!menuOpen) return undefined;
@@ -74,6 +87,112 @@ export default function PostCard({
 
   const pickReaction = (name) => { onReact ? onReact(name) : onToggleLike && onToggleLike(); setShowPicker(false); };
   const submit = (e) => { e.preventDefault(); if ((comments.value || "").trim()) comments.onSubmit && comments.onSubmit(); };
+
+  // "Name and N others" when a sample reactor is known, else a bare count.
+  const reactionText = topReactorName
+    ? reactionTotal > 1
+      ? `${topReactorName} and ${reactionTotal - 1} other${reactionTotal - 1 > 1 ? "s" : ""}`
+      : topReactorName
+    : `${reactionTotal} reaction${reactionTotal > 1 ? "s" : ""}`;
+
+  // The reaction summary always sits directly above the action bar. With
+  // media, that pair sits right under it (Instagram convention); text-only
+  // posts have nothing to sit under, so the pair stays below the caption
+  // instead, just before "View all N comments".
+  const reactionSummary = topReactionNames.length > 0 ? (
+    <div className="bond-post-card__likes">
+      <button type="button" className="bond-post-card__likes-btn bond-post-card__likes-btn--reactions" onClick={(e) => { stop(e); onOpenLikes && onOpenLikes(); }}>
+        <span className="bond-post-card__react-stack" aria-hidden>
+          {topReactionNames.map((name) => (
+            <span key={name} className="bond-post-card__react-emoji" title={name}>{REACTION_EMOJI[name]}</span>
+          ))}
+        </span>
+        <span className="bond-post-card__react-count">{reactionText}</span>
+      </button>
+      {comments.count > 0 ? <span className="bond-post-card__likes-comment-count">{comments.count} comments</span> : null}
+    </div>
+  ) : likesText ? (
+    <div className="bond-post-card__likes">
+      <button type="button" className="bond-post-card__likes-btn" onClick={(e) => { stop(e); onOpenLikes && onOpenLikes(); }}>
+        {likesText}
+      </button>
+      {comments.count > 0 ? <span className="bond-post-card__likes-comment-count">{comments.count} comments</span> : null}
+    </div>
+  ) : null;
+
+  const interestsBlock = interests.length > 0 ? (
+    <div className="bond-post-card__interests">
+      {interests.map((it) => (
+        <span key={it.id} className="bond-post-card__interest"
+          onClick={(e) => { stop(e); onInterestClick && onInterestClick(it, e); }}>
+          {it.name}
+        </span>
+      ))}
+    </div>
+  ) : null;
+
+  const likeLabel = currentReaction ? currentReaction.charAt(0).toUpperCase() + currentReaction.slice(1) : "Like";
+  const actionColumnCount = 3 + (onToggleSave ? 1 : 0);
+
+  const actionsRow = (
+    <div className="bond-post-card__actions-row" style={{ gridTemplateColumns: `repeat(${actionColumnCount}, 1fr)` }}>
+      <div
+        style={{ position: "relative", width: "100%", height: "100%" }}
+        onMouseEnter={openPicker}
+        onMouseLeave={scheduleClosePicker}
+      >
+        <button
+          type="button"
+          aria-label="Like"
+          className={`bond-post-card__action-pill ${liked || currentReaction ? "bond-post-card__action-pill--active" : ""}`}
+          style={{ width: "100%", height: "100%" }}
+          onClick={(e) => { stop(e); onToggleLike ? onToggleLike() : pickReaction("like"); }}
+        >
+          {currentReaction && currentReaction !== "like" ? (
+            <span style={{ fontSize: 16, lineHeight: 1 }}>{REACTION_EMOJI[currentReaction]}</span>
+          ) : (
+            <Heart size={16} />
+          )}
+          <span>{likeLabel}</span>
+        </button>
+        {showPicker && onReact ? (
+          <div className="bond-post-card__picker" onClick={stop}>
+            {REACTION_ORDER.map((name) => (
+              <button key={name} type="button" title={name} className="bond-post-card__picker-btn"
+                onClick={(e) => { stop(e); pickReaction(name); }}>
+                {REACTION_EMOJI[name]}
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
+
+      <button type="button" aria-label="Comment" className="bond-post-card__action-pill"
+        onClick={(e) => { stop(e); comments.onToggle && comments.onToggle(); }}>
+        <MessageCircle size={16} />
+        <span>Comment</span>
+      </button>
+
+      {shareSlot ? (
+        <span className="bond-post-card__action-pill-slot">{shareSlot}</span>
+      ) : (
+        <button type="button" aria-label="Share" className="bond-post-card__action-pill"
+          onClick={(e) => { stop(e); share.onShare && share.onShare(e); }}>
+          <Send size={16} />
+          <span>Share</span>
+        </button>
+      )}
+
+      {onToggleSave ? (
+        <button type="button" aria-label="Save"
+          className={`bond-post-card__action-pill ${saved ? "bond-post-card__action-pill--active" : ""}`}
+          onClick={(e) => { stop(e); onToggleSave(); }}>
+          <Bookmark size={16} />
+          <span>{saved ? "Saved" : "Bookmark"}</span>
+        </button>
+      ) : null}
+    </div>
+  );
 
   return (
     <article className={`bond-post-card ${className}`} onClick={onCardClick}>
@@ -156,96 +275,28 @@ export default function PostCard({
 
       {/* Body */}
       <div className="bond-post-card__body" onClick={stop}>
-        <div className="bond-post-card__actions-row">
-          <div className="bond-post-card__actions-left">
-            <div
-              style={{ position: "relative", display: "inline-flex" }}
-              onMouseEnter={openPicker}
-              onMouseLeave={scheduleClosePicker}
-            >
-              <button
-                type="button"
-                aria-label="Like"
-                className={`bond-post-card__action-icon ${liked || currentReaction ? "bond-post-card__action-icon--liked" : ""}`}
-                onClick={(e) => { stop(e); onToggleLike ? onToggleLike() : pickReaction("like"); }}
-              >
-                {currentReaction ? (
-                  <span style={{ fontSize: 22, lineHeight: 1 }}>{REACTION_EMOJI[currentReaction] || REACTION_EMOJI.like}</span>
-                ) : (
-                  <Heart size={24} />
-                )}
-              </button>
-              {showPicker && onReact ? (
-                <div className="bond-post-card__picker" onClick={stop}>
-                  {REACTION_ORDER.map((name) => (
-                    <button key={name} type="button" title={name} className="bond-post-card__picker-btn"
-                      onClick={(e) => { stop(e); pickReaction(name); }}>
-                      {REACTION_EMOJI[name]}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-
-            <button type="button" aria-label="Comment" className="bond-post-card__action-icon"
-              onClick={(e) => { stop(e); comments.onToggle && comments.onToggle(); }}>
-              <MessageCircle size={24} />
-            </button>
-
-            {shareSlot ? (
-              <span className="bond-post-card__action-icon">{shareSlot}</span>
-            ) : (
-              <button type="button" aria-label="Share" className="bond-post-card__action-icon"
-                onClick={(e) => { stop(e); share.onShare && share.onShare(e); }}>
-                <Send size={24} />
-              </button>
-            )}
-          </div>
-
-          {onToggleSave ? (
-            <button type="button" aria-label="Save"
-              className={`bond-post-card__action-icon ${saved ? "bond-post-card__action-icon--saved" : ""}`}
-              onClick={(e) => { stop(e); onToggleSave(); }}>
-              <Bookmark size={24} />
-            </button>
-          ) : null}
-        </div>
-
-        {topReactionNames.length > 0 ? (
-          <div className="bond-post-card__likes">
-            <button type="button" className="bond-post-card__likes-btn bond-post-card__likes-btn--reactions" onClick={(e) => { stop(e); onOpenLikes && onOpenLikes(); }}>
-              <span className="bond-post-card__react-stack" aria-hidden>
-                {topReactionNames.map((name) => (
-                  <span key={name} className="bond-post-card__react-emoji" title={name}>{REACTION_EMOJI[name]}</span>
-                ))}
-              </span>
-              <span className="bond-post-card__react-count">{reactionTotal}</span>
-            </button>
-          </div>
-        ) : likesText ? (
-          <div className="bond-post-card__likes">
-            <button type="button" className="bond-post-card__likes-btn" onClick={(e) => { stop(e); onOpenLikes && onOpenLikes(); }}>
-              {likesText}
-            </button>
-          </div>
+        {item ? (
+          <>
+            {interestsBlock}
+            {reactionSummary}
+            {actionsRow}
+          </>
         ) : null}
 
-        {interests.length > 0 ? (
-          <div className="bond-post-card__interests">
-            {interests.map((it) => (
-              <span key={it.id} className="bond-post-card__interest"
-                onClick={(e) => { stop(e); onInterestClick && onInterestClick(it, e); }}>
-                {it.name}
-              </span>
-            ))}
-          </div>
-        ) : null}
+        {!item ? interestsBlock : null}
 
         {caption ? (
           <div className="bond-post-card__caption">
             {author.name ? <span className="bond-post-card__strong">{author.name} </span> : null}
             <span>{caption}</span>
           </div>
+        ) : null}
+
+        {!item ? (
+          <>
+            {reactionSummary}
+            {actionsRow}
+          </>
         ) : null}
 
         {comments.count > 0 || comments.visible ? (
@@ -259,11 +310,12 @@ export default function PostCard({
 
         {comments.canComment ? (
           <form className="bond-post-card__comment-form" onSubmit={submit}>
+            <span className="bond-post-card__comment-avatar">
+              {currentUserAvatarUrl ? <img src={currentUserAvatarUrl} alt="" /> : null}
+            </span>
             <input type="text" className="bond-post-card__comment-input" placeholder="Add a comment..."
               value={comments.value || ""} onChange={(e) => comments.onChange && comments.onChange(e.target.value)} />
-            {(comments.value || "").trim() ? (
-              <button type="submit" className="bond-post-card__comment-post">Post</button>
-            ) : null}
+            <button type="submit" className="bond-post-card__comment-post" disabled={!(comments.value || "").trim()}>Post</button>
           </form>
         ) : null}
       </div>

@@ -1,0 +1,177 @@
+/* CommentsSection — standalone card frame (header/sort/composer) around
+   CommentsList. Self-contained (no Tailwind required), same convention as
+   PostCard.css. Use CommentsList directly when embedding inside a card that
+   already has its own header + composer. */
+
+.bond-comments-section {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #160a2c;
+  color: #fff;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+  font-family: inherit;
+}
+
+.bond-comments-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px 20px;
+}
+.bond-comments-section__title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+}
+.bond-comments-section__count {
+  color: rgba(200, 180, 240, 0.55);
+  font-weight: 500;
+}
+.bond-comments-section__sort {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.bond-comments-section__sort select {
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 6px 26px 6px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(200, 180, 240, 0.75);
+  cursor: pointer;
+}
+.bond-comments-section__sort select:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+.bond-comments-section__sort svg {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: rgba(200, 180, 240, 0.55);
+}
+.bond-comments-section__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.bond-comments-section__body {
+  padding: 20px;
+}
+
+.bond-comments-section__empty {
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 36px 20px;
+  text-align: center;
+}
+.bond-comments-section__empty p:first-child {
+  margin: 0 0 4px;
+  font-weight: 500;
+  color: rgba(230, 220, 245, 0.9);
+}
+.bond-comments-section__empty p:last-child {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(200, 180, 240, 0.5);
+}
+
+.bond-comments-section__composer {
+  display: flex;
+  gap: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.015);
+  padding: 16px 20px;
+}
+.bond-comments-section__composer-avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 2px rgba(139, 69, 255, 0.55);
+  background: linear-gradient(135deg, rgba(139, 69, 255, 0.32), rgba(217, 70, 239, 0.14));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+  color: rgba(235, 226, 255, 0.95);
+  overflow: hidden;
+}
+.bond-comments-section__composer-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.bond-comments-section__composer-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.035);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.bond-comments-section__composer-input:focus-within {
+  border-color: rgba(139, 69, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(139, 69, 255, 0.12);
+}
+.bond-comments-section__composer-input textarea {
+  display: block;
+  width: 100%;
+  resize: none;
+  background: transparent;
+  border: 0;
+  outline: none;
+  padding: 14px 16px 0;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #fff;
+}
+.bond-comments-section__composer-input textarea::placeholder {
+  color: rgba(200, 180, 240, 0.45);
+}
+.bond-comments-section__composer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px 12px;
+}
+.bond-comments-section__composer-footer span {
+  font-size: 12px;
+  color: rgba(200, 180, 240, 0.4);
+}
+.bond-comments-section__composer-footer button {
+  min-width: 88px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 0;
+  background: rgba(139, 69, 255, 0.85);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+.bond-comments-section__composer-footer button:hover:not(:disabled) {
+  background: rgba(139, 69, 255, 1);
+}
+.bond-comments-section__composer-footer button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

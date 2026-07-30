@@ -19,6 +19,7 @@ const baseArgs = {
   onToggleSave: noop,
   share: { onShare: noop },
   comments: { count: 12, visible: false, onToggle: noop, canComment: true, value: "", onChange: noop, onSubmit: noop },
+  currentUserAvatarUrl: "https://i.pravatar.cc/80?img=12",
   menuItems: [
     { key: "save", label: "❤️ Save", onClick: noop },
     { key: "report", label: "🚩 Report Post", onClick: noop },
