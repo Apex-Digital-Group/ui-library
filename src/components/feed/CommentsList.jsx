@@ -142,6 +142,7 @@ function CommentNode({
   onAuthorClick,
   onSubmitReply,
   currentUserAvatarUrl,
+  authorWrapper = (children) => children,
   repliesLabel = (n) => (n === 1 ? "Reply" : "Replies"),
 }) {
   const [showReplies, setShowReplies] = useState(false);
@@ -192,18 +193,24 @@ function CommentNode({
   return (
     <article className={`bond-comments__item ${nested ? "bond-comments__item--nested" : ""}`}>
       <div className="bond-comments__item-row">
-        <Avatar
-          name={comment.author?.name}
-          src={comment.author?.pictureUrl}
-          size={nested ? "sm" : "md"}
-          onClick={() => onAuthorClick && onAuthorClick(comment)}
-        />
+        {authorWrapper(
+          <Avatar
+            name={comment.author?.name}
+            src={comment.author?.pictureUrl}
+            size={nested ? "sm" : "md"}
+            onClick={() => onAuthorClick && onAuthorClick(comment)}
+          />,
+          comment
+        )}
 
         <div className="bond-comments__item-body">
           <div className="bond-comments__bubble">
-            <span className="bond-comments__author" onClick={() => onAuthorClick && onAuthorClick(comment)}>
-              {comment.author?.name}
-            </span>
+            {authorWrapper(
+              <span className="bond-comments__author" onClick={() => onAuthorClick && onAuthorClick(comment)}>
+                {comment.author?.name}
+              </span>,
+              comment
+            )}
             {comment.author?.verified && <VerifiedBadge />}
             <time className="bond-comments__time">{comment.createdAt}</time>
             <p className="bond-comments__message">{comment.message}</p>
@@ -273,6 +280,7 @@ function CommentNode({
                 onAuthorClick={onAuthorClick}
                 onSubmitReply={onSubmitReply}
                 currentUserAvatarUrl={currentUserAvatarUrl}
+                authorWrapper={authorWrapper}
                 repliesLabel={repliesLabel}
               />
             ))}
@@ -320,6 +328,10 @@ export default function CommentsList({
   onAuthorClick,
   onSubmitReply,
   currentUserAvatarUrl,
+  // Host-injected wrapper around each comment's avatar/name — receives
+  // (children, comment). Identity by default (e.g. wrap in a hover profile
+  // card in the host app).
+  authorWrapper,
   initialVisibleCount = 1,
   loadMoreStep = 10,
   loadMoreLabel = "View more comments",
@@ -372,6 +384,7 @@ export default function CommentsList({
           onAuthorClick={onAuthorClick}
           onSubmitReply={onSubmitReply}
           currentUserAvatarUrl={currentUserAvatarUrl}
+          {...(authorWrapper ? { authorWrapper } : {})}
           repliesLabel={repliesLabel}
         />
       ))}

@@ -43,6 +43,9 @@ export default function PostCard({
   onCardClick,
   className = "",
   currentUserAvatarUrl,
+  // Host-injected wrapper around the author avatar/name (e.g. a hover
+  // profile card). Identity by default so the component stays host-agnostic.
+  authorWrapper = (children) => children,
 }) {
   const [showPicker, setShowPicker] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -200,13 +203,17 @@ export default function PostCard({
       <div className="bond-post-card__header">
         <div className="bond-post-card__author">
           {author.picture ? (
-            <img className="bond-post-card__avatar" src={author.picture} alt={author.name || "user"}
-              onClick={(e) => { stop(e); onAuthorClick && onAuthorClick(e); }} />
+            authorWrapper(
+              <img className="bond-post-card__avatar" src={author.picture} alt={author.name || "user"}
+                onClick={(e) => { stop(e); onAuthorClick && onAuthorClick(e); }} />
+            )
           ) : null}
           <div className="bond-post-card__name-row">
-            <span className="bond-post-card__name" onClick={(e) => { stop(e); onAuthorClick && onAuthorClick(e); }}>
-              {author.name}
-            </span>
+            {authorWrapper(
+              <span className="bond-post-card__name" onClick={(e) => { stop(e); onAuthorClick && onAuthorClick(e); }}>
+                {author.name}
+              </span>
+            )}
             {author.verified ? (
               <svg className="bond-post-card__verified" viewBox="0 0 24 24" fill="currentColor" aria-label="verified">
                 <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
