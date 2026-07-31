@@ -94,7 +94,7 @@ function ReactionPicker({ onPick }) {
   );
 }
 
-function ReplyComposer({ onSubmit, onCancel, placeholder = "Reply…", autoFocus = true }) {
+function ReplyComposer({ onSubmit, onCancel, placeholder = "Reply…" }) {
   const [value, setValue] = useState("");
   const submit = () => {
     const trimmed = value.trim();
@@ -114,10 +114,13 @@ function ReplyComposer({ onSubmit, onCancel, placeholder = "Reply…", autoFocus
             e.preventDefault();
             submit();
           } else if (e.key === "Escape") {
+            // Close only this composer — don't let Esc bubble on to a host
+            // modal (antd closes the whole post modal on Esc).
+            e.stopPropagation();
             onCancel && onCancel();
           }
         }}
-        autoFocus={autoFocus}
+        autoFocus
       />
     </div>
   );
@@ -145,7 +148,6 @@ function CommentNode({
   const [replying, setReplying] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const pickerCloseTimer = useRef(null);
-  const threadComposerRef = useRef(null);
   useEffect(() => () => clearTimeout(pickerCloseTimer.current), []);
 
   const openPicker = useCallback(() => {
@@ -161,20 +163,6 @@ function CommentNode({
   const replies = comment.replies || [];
   const hasReplies = replies.length > 0;
 
-  // Reply on a threaded comment routes to the composer pinned at the
-  // thread's end — once the thread is open, focus that composer so the
-  // click visibly "opens the reply box" instead of silently expanding.
-  useEffect(() => {
-    if (!(replying && hasReplies && showReplies)) return;
-    const node = threadComposerRef.current;
-    if (node) {
-      const ta = node.querySelector("textarea");
-      if (ta) ta.focus();
-      node.scrollIntoView({ block: "nearest" });
-    }
-    setReplying(false);
-  }, [replying, hasReplies, showReplies]);
-
   const requireAuth = () => {
     if (hasAuthSession) return true;
     onRequireAuth && onRequireAuth();
@@ -189,13 +177,13 @@ function CommentNode({
 
   const startReply = () => {
     if (!requireAuth()) return;
-    // A comment with an open-able thread replies through the composer pinned
-    // at the thread's end (design behavior); leaf comments get the transient
-    // inline composer. `replying` doubles as the focus-intent flag the
-    // effect above consumes once the thread composer is mounted.
+    // A comment with an open-able thread replies through the composer at the
+    // thread's end; leaf comments get the inline composer. Either way the
+    // composer only exists while `replying` — hidden by default, opened
+    // (and autofocused, since it mounts fresh) by the Reply click.
     if (hasReplies) {
       setShowReplies(true);
-      setReplying(true);
+      setReplying((v) => !(v && showReplies));
     } else {
       setReplying((v) => !v);
     }
@@ -289,13 +277,16 @@ function CommentNode({
               />
             ))}
 
-            {hasAuthSession && (
-              <div className="bond-comments__thread-composer" ref={threadComposerRef}>
+            {replying && hasAuthSession && (
+              <div className="bond-comments__thread-composer">
                 <Avatar name="You" src={currentUserAvatarUrl} size="sm" />
                 <ReplyComposer
-                  autoFocus={false}
                   placeholder="Add a reply…"
-                  onSubmit={(text) => onSubmitReply && onSubmitReply(comment, text)}
+                  onCancel={() => setReplying(false)}
+                  onSubmit={(text) => {
+                    onSubmitReply && onSubmitReply(comment, text);
+                    setReplying(false);
+                  }}
                 />
               </div>
             )}
