@@ -1,0 +1,242 @@
+/* ListingToolbar — the shared listing header (search / selects / view toggle /
+   injected extras). Visual tokens mirror the app's legacy shells
+   (top-search-section / listing-search-shell / listing-sort-shell /
+   view-toggle-group in global-theme.css) so migrated pages look identical. */
+
+.bond-ltb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(30, 15, 60, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(139, 69, 255, 0.15);
+  border-radius: 12px;
+  margin: 0 0 12px 0;
+}
+.bond-ltb--subnav {
+  border-radius: 0 0 12px 12px;
+  border-top: none;
+}
+.bond-ltb--sticky {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.bond-ltb__spacer {
+  flex: 1 1 auto;
+}
+
+/* ── Search ── */
+.bond-ltb__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+  min-height: 36px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(139, 69, 255, 0.2);
+  border-radius: 8px;
+}
+.bond-ltb__search svg {
+  color: rgba(220, 200, 255, 0.5);
+  flex-shrink: 0;
+}
+.bond-ltb__search input {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: rgba(220, 200, 255, 0.9);
+  font-size: 14px;
+  line-height: 1.2;
+}
+.bond-ltb__search input::placeholder {
+  color: rgba(220, 200, 255, 0.55);
+}
+.bond-ltb__search-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  padding: 2px;
+  cursor: pointer;
+  color: rgba(220, 200, 255, 0.5);
+  border-radius: 50%;
+}
+.bond-ltb__search-clear:hover {
+  color: rgba(220, 200, 255, 0.9);
+  background: rgba(139, 69, 255, 0.2);
+}
+
+/* ── Select (lib-owned popover, antd-free) ── */
+.bond-ltb__select {
+  position: relative;
+  display: inline-flex;
+}
+.bond-ltb__select-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 160px;
+  min-height: 36px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(139, 69, 255, 0.2);
+  border-radius: 8px;
+  color: rgba(220, 200, 255, 0.9);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.bond-ltb__select-btn:hover {
+  border-color: rgba(255, 105, 180, 0.4);
+  background: rgba(139, 69, 255, 0.12);
+}
+.bond-ltb__select-btn svg:first-child {
+  color: rgba(220, 200, 255, 0.6);
+}
+.bond-ltb__select-label {
+  flex: 1 1 auto;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bond-ltb__select-caret {
+  color: rgba(220, 200, 255, 0.5);
+  transition: transform 0.2s ease;
+}
+.bond-ltb__select--open .bond-ltb__select-caret {
+  transform: rotate(180deg);
+}
+.bond-ltb__select-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 100%;
+  z-index: 60;
+  padding: 6px;
+  background: rgba(24, 12, 48, 0.97);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(139, 69, 255, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+}
+.bond-ltb__select-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: rgba(220, 200, 255, 0.85);
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.bond-ltb__select-item:hover {
+  background: rgba(139, 69, 255, 0.2);
+  color: #fff;
+}
+.bond-ltb__select-item--active {
+  background: rgba(139, 69, 255, 0.32);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ── View toggle ── */
+.bond-ltb__toggle {
+  display: flex;
+  gap: 4px;
+  background: rgba(139, 69, 255, 0.1);
+  border-radius: 8px;
+  padding: 4px;
+  border: 1px solid rgba(139, 69, 255, 0.15);
+}
+.bond-ltb__toggle button {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+  color: rgba(200, 180, 230, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.bond-ltb__toggle button[aria-pressed="true"] {
+  background: rgba(139, 69, 255, 0.35);
+  color: hsl(270, 100%, 85%);
+}
+.bond-ltb__toggle button:hover:not([aria-pressed="true"]) {
+  color: rgba(200, 180, 230, 0.8);
+  background: rgba(139, 69, 255, 0.15);
+}
+
+/* ── Buttons (site-standard 36px pills) ── */
+.bond-ltb__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+.bond-ltb__btn--primary {
+  border: none;
+  color: #fff;
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+}
+.bond-ltb__btn--primary:hover {
+  filter: brightness(1.1);
+}
+.bond-ltb__btn--ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+.bond-ltb__btn--ghost:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+.bond-ltb__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  width: 38px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(220, 200, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.bond-ltb__icon-btn:hover {
+  color: #fff;
+  background: rgba(139, 69, 255, 0.2);
+}
+
+/* ── Slot: inherits row height/rhythm, content untouched ── */
+.bond-ltb__slot {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  gap: 8px;
+}
