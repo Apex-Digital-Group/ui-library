@@ -240,3 +240,33 @@
   min-height: 36px;
   gap: 8px;
 }
+
+.bond-ltb__select-menu--right {
+  left: auto;
+  right: 0;
+}
+.bond-ltb__select-item--focus {
+  background: rgba(139, 69, 255, 0.2);
+  color: #fff;
+}
+
+.bond-ltb__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: none;
+}
+
+/* ── Mobile: wrap instead of overflowing; search takes the full row ── */
+@media (max-width: 720px) {
+  .bond-ltb {
+    flex-wrap: wrap;
+  }
+  .bond-ltb__search {
+    max-width: 100% !important;
+    flex: 1 1 100%;
+    order: -1;
+  }
+  .bond-ltb__spacer {
+    display: none;
+  }
+}

@@ -59,6 +59,37 @@ describe('ListingToolbar', () => {
     })
   })
 
+  describe('Search (controlled)', () => {
+    it('follows an externally-set value (URL presets / clear-all-filters)', () => {
+      const { rerender } = render(<ListingToolbar.Search placeholder="Search" value="preset" onCommit={() => {}} />)
+      expect(screen.getByPlaceholderText('Search').value).toBe('preset')
+      rerender(<ListingToolbar.Search placeholder="Search" value="" onCommit={() => {}} />)
+      expect(screen.getByPlaceholderText('Search').value).toBe('')
+    })
+  })
+
+  describe('Select keyboard navigation', () => {
+    it('opens with ArrowDown, moves highlight, selects with Enter', () => {
+      const onChange = vi.fn()
+      render(<ListingToolbar.Select ariaLabel="Sort" value="newest" options={SORTS} onChange={onChange} />)
+      const btn = screen.getByRole('button', { name: 'Sort' })
+      fireEvent.keyDown(btn, { key: 'ArrowDown' })          // open (highlight on current = Newest)
+      expect(screen.getByRole('listbox')).toBeTruthy()
+      fireEvent.keyDown(btn, { key: 'ArrowDown' })          // highlight -> Oldest
+      fireEvent.keyDown(btn, { key: 'Enter' })              // pick it
+      expect(onChange).toHaveBeenCalledWith('oldest')
+      expect(screen.queryByRole('listbox')).toBeNull()
+    })
+
+    it('Escape closes the menu', () => {
+      render(<ListingToolbar.Select ariaLabel="Sort" value="newest" options={SORTS} onChange={() => {}} />)
+      const btn = screen.getByRole('button', { name: 'Sort' })
+      fireEvent.click(btn)
+      fireEvent.keyDown(btn, { key: 'Escape' })
+      expect(screen.queryByRole('listbox')).toBeNull()
+    })
+  })
+
   describe('Select', () => {
     it('opens, selects an option, closes', () => {
       const onChange = vi.fn()
