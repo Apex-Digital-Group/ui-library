@@ -466,3 +466,30 @@
   opacity: 0.35;
   cursor: not-allowed;
 }
+
+/* R3 hover (design system): lift + pink border + violet/pink glow +
+   cyan->magenta top edge reveal. overflow:hidden already set on the card. */
+.bond-post-card {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.bond-post-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00d4d4, #ff3d8a);
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 5;
+}
+.bond-post-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 105, 180, 0.4);
+  box-shadow: 0 18px 38px rgba(139, 69, 255, 0.28), 0 0 54px rgba(255, 105, 180, 0.16);
+}
+.bond-post-card:hover::after {
+  opacity: 1;
+}
