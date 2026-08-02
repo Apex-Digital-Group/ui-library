@@ -452,15 +452,15 @@
   border: 0;
   border-radius: 8px;
   padding: 7px 16px;
-  background: var(--bond-accent, #8b5cf6);
+  background: linear-gradient(90deg, #a855f7, #ec4899);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease, opacity 0.15s ease;
+  transition: filter 0.15s ease, opacity 0.15s ease;
 }
 .bond-post-card__comment-post:hover:not(:disabled) {
-  background: #9d71f7;
+  filter: brightness(1.1);
 }
 .bond-post-card__comment-post:disabled {
   opacity: 0.35;
@@ -492,4 +492,32 @@
 }
 .bond-post-card:hover::after {
   opacity: 1;
+}
+
+/* Reacted state: the platform's primary gradient — matches the rendered
+   reaction trigger in the video/gallery modals (their antd primary buttons
+   are globally skinned with this same gradient). */
+.bond-post-card__action-pill--reacted,
+.bond-post-card__action-pill--reacted:hover {
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+  color: #fff;
+}
+.bond-post-card__action-pill--reacted:hover {
+  filter: brightness(1.1);
+}
+.bond-post-card__action-pill--reacted svg {
+  fill: #fff;
+  stroke: #fff;
+}
+
+/* Saved state: violet chip, same recipe as the modals' "Saved" button. */
+.bond-post-card__action-pill--saved,
+.bond-post-card__action-pill--saved:hover {
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #a78bfa;
+}
+.bond-post-card__action-pill--saved svg {
+  fill: #a78bfa;
+  stroke: #a78bfa;
 }

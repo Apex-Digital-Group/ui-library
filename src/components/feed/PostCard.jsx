@@ -147,7 +147,7 @@ export default function PostCard({
         <button
           type="button"
           aria-label="Like"
-          className={`bond-post-card__action-pill ${liked || currentReaction ? "bond-post-card__action-pill--active" : ""}`}
+          className={`bond-post-card__action-pill ${liked || currentReaction ? "bond-post-card__action-pill--active" : ""} ${currentReaction ? "bond-post-card__action-pill--reacted" : ""}`}
           style={{ width: "100%", height: "100%" }}
           onClick={(e) => { stop(e); onToggleLike ? onToggleLike() : pickReaction("like"); }}
         >
@@ -188,7 +188,7 @@ export default function PostCard({
 
       {onToggleSave ? (
         <button type="button" aria-label="Save"
-          className={`bond-post-card__action-pill ${saved ? "bond-post-card__action-pill--active" : ""}`}
+          className={`bond-post-card__action-pill ${saved ? "bond-post-card__action-pill--saved" : ""}`}
           onClick={(e) => { stop(e); onToggleSave(); }}>
           <Bookmark size={16} />
           <span>{saved ? "Saved" : "Bookmark"}</span>
