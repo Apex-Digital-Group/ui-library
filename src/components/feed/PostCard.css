@@ -510,14 +510,16 @@
   stroke: #fff;
 }
 
-/* Saved state: violet chip, same recipe as the modals' "Saved" button. */
+/* Saved state: same platform primary gradient as the reacted pill. */
 .bond-post-card__action-pill--saved,
 .bond-post-card__action-pill--saved:hover {
-  background: rgba(139, 92, 246, 0.15);
-  border: 1px solid rgba(139, 92, 246, 0.4);
-  color: #a78bfa;
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+  color: #fff;
+}
+.bond-post-card__action-pill--saved:hover {
+  filter: brightness(1.1);
 }
 .bond-post-card__action-pill--saved svg {
-  fill: #a78bfa;
-  stroke: #a78bfa;
+  fill: #fff;
+  stroke: #fff;
 }
