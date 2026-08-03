@@ -9,6 +9,7 @@
     ".": "./src/index.js",
     "./story/StoryCard": "./src/components/story/StoryCard.jsx",
     "./feed/PostCard": "./src/components/feed/PostCard.jsx",
+    "./listing/ListingToolbar": "./src/components/listing/ListingToolbar.jsx",
     "./feed/CommentsList": "./src/components/feed/CommentsList.jsx",
     "./feed/CommentsSection": "./src/components/feed/CommentsSection.jsx",
     "./feed/SuggestedForYou": "./src/components/feed/SuggestedForYou.jsx",
