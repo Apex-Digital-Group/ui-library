@@ -7,6 +7,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  /* backdrop-filter makes this a stacking context, trapping the select menus'
+     z-index inside it — without a z-index of its own, content that follows in
+     the DOM (cards) paints OVER an open dropdown. */
+  position: relative;
+  z-index: 40;
   padding: 10px 14px;
   background: rgba(30, 15, 60, 0.6);
   backdrop-filter: blur(16px);
