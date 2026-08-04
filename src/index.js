@@ -132,6 +132,7 @@ export { default as ReferTokenWallet } from './components/refer/ReferTokenWallet
 // top-level modals / layouts
 export { default as AccountPendingModal } from './components/AccountPendingModal'
 export { default as CreditsModal } from './components/CreditsModal'
+export { default as ModalHeader } from './components/ModalHeader'
 export { default as GeminiAI } from './components/GeminiAI'
 export { default as KycModal } from './components/KycModal'
 export { default as PostDetailModal } from './components/PostDetailModal'
