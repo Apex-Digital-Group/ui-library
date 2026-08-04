@@ -1,0 +1,275 @@
+/* Settings primitives (2026-08-04, per Live Gemini Settings v3 mock +
+   feature-page-design-system R1–R10). Plain CSS like ListingToolbar so the
+   app's 10px-rem base can't shrink anything. */
+
+/* ── Section card ── */
+.bond-set-section {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 26px 28px 10px;
+  overflow: hidden;
+}
+.bond-set-section::before {
+  /* mock: cyan→violet gradient hairline across the top edge */
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00d4d4, #8b45ff 55%, rgba(139, 69, 255, 0));
+}
+.bond-set-section__title {
+  margin: 0;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.bond-set-section__subtitle {
+  margin: 4px 0 6px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13.5px;
+}
+
+/* ── Row ── */
+.bond-set-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.2s ease;
+}
+.bond-set-row:first-of-type {
+  border-top: none;
+}
+.bond-set-row__icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 212, 212, 0.1);
+  border: 1px solid rgba(0, 212, 212, 0.22);
+  color: #7de8e8;
+}
+.bond-set-row--danger .bond-set-row__icon {
+  background: rgba(244, 63, 94, 0.12);
+  border-color: rgba(244, 63, 94, 0.3);
+  color: #fb7185;
+}
+.bond-set-row__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.bond-set-row__title {
+  margin: 0;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bond-set-row__desc {
+  margin: 3px 0 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.bond-set-row__control {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Coming-soon placeholder: full design, muted control, cyan state chip. */
+.bond-set-row--soon .bond-set-row__control {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.bond-set-chip-soon {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7de8e8;
+  background: rgba(0, 212, 212, 0.12);
+  border: 1px solid rgba(0, 212, 212, 0.4);
+}
+.bond-set-chip-action {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fda4af;
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+}
+
+/* ── Buttons (site-standard 36px pills, ghost/primary/danger) ── */
+.bond-set-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+}
+.bond-set-btn:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+.bond-set-btn--primary {
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+  border: none;
+  color: #fff;
+}
+.bond-set-btn--primary:hover {
+  filter: brightness(1.1);
+}
+.bond-set-btn--danger {
+  background: rgba(244, 63, 94, 0.12);
+  border-color: rgba(244, 63, 94, 0.45);
+  color: #fb7185;
+}
+.bond-set-btn--danger:hover {
+  background: rgba(244, 63, 94, 0.22);
+  color: #fecdd3;
+}
+
+/* ── Toggle ── */
+.bond-set-toggle {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+.bond-set-toggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.25s ease;
+}
+.bond-set-toggle[aria-checked="true"] {
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+  border-color: transparent;
+}
+.bond-set-toggle[aria-checked="true"]::after {
+  transform: translateX(20px);
+}
+.bond-set-toggle:disabled {
+  cursor: not-allowed;
+}
+
+/* ── Stepper ── */
+.bond-set-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 3px;
+}
+.bond-set-stepper__btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.bond-set-stepper__btn:hover:not(:disabled) {
+  background: rgba(139, 69, 255, 0.35);
+  color: #fff;
+}
+.bond-set-stepper__btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.bond-set-stepper__value {
+  min-width: 64px;
+  text-align: center;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+.bond-set-stepper__value small {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+  font-size: 12px;
+  margin-left: 3px;
+}
+
+/* ── Pill group ── */
+.bond-set-pills {
+  display: inline-flex;
+  gap: 8px;
+}
+.bond-set-pills__pill {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.bond-set-pills__pill:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+.bond-set-pills__pill[aria-pressed="true"] {
+  /* cyan-as-state per the design system */
+  background: rgba(0, 212, 212, 0.14);
+  border-color: rgba(0, 212, 212, 0.55);
+  color: #9ff0f0;
+}
+
+@media (max-width: 640px) {
+  .bond-set-row {
+    flex-wrap: wrap;
+  }
+  .bond-set-row__control {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

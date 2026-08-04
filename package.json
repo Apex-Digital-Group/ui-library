@@ -11,6 +11,7 @@
     "./feed/PostCard": "./src/components/feed/PostCard.jsx",
     "./listing/ListingToolbar": "./src/components/listing/ListingToolbar.jsx",
     "./ModalHeader": "./src/components/ModalHeader.jsx",
+    "./settings/SettingsSection": "./src/components/settings/SettingsSection.jsx",
     "./feed/CommentsList": "./src/components/feed/CommentsList.jsx",
     "./feed/CommentsSection": "./src/components/feed/CommentsSection.jsx",
     "./feed/SuggestedForYou": "./src/components/feed/SuggestedForYou.jsx",

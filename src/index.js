@@ -133,6 +133,10 @@ export { default as ReferTokenWallet } from './components/refer/ReferTokenWallet
 export { default as AccountPendingModal } from './components/AccountPendingModal'
 export { default as CreditsModal } from './components/CreditsModal'
 export { default as ModalHeader } from './components/ModalHeader'
+export {
+  default as SettingsSection, SettingsRow, SettingsButton, SettingsActionChip,
+  SettingsToggle, SettingsStepper, SettingsPillGroup,
+} from './components/settings/SettingsSection'
 export { default as GeminiAI } from './components/GeminiAI'
 export { default as KycModal } from './components/KycModal'
 export { default as PostDetailModal } from './components/PostDetailModal'
