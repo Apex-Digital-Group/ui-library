@@ -38,14 +38,34 @@
   padding: 18px 18px 6px;
   margin-bottom: 14px;
   overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .bond-sec-card::before {
   content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
   background: linear-gradient(90deg, #00d4d4, #ff3d8a);
   opacity: 0.75;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .bond-sec-card--ok::before { background: linear-gradient(90deg, #22c55e, #00d4d4); }
 .bond-sec-card--warn::before { background: linear-gradient(90deg, #fbbf24, #ff3d8a); }
+/* R3 hover: lift, pink border + violet/pink glow, top edge brightens to the
+   full cyan→magenta accent (mandatory card hover in the design system). */
+.bond-sec-card::after {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 2px;
+  background: linear-gradient(90deg, #00d4d4, #ff3d8a);
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+.bond-sec-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 105, 180, 0.4);
+  box-shadow: 0 18px 38px rgba(139, 69, 255, 0.28), 0 0 54px rgba(255, 105, 180, 0.16);
+}
+.bond-sec-card:hover::before { opacity: 0; }
+.bond-sec-card:hover::after { opacity: 1; }
 .bond-sec-card__head { display: flex; align-items: center; gap: 12px; }
 .bond-sec-card__icon {
   width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
