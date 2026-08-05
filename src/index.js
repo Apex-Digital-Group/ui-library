@@ -137,6 +137,10 @@ export {
   default as SettingsSection, SettingsRow, SettingsButton, SettingsActionChip,
   SettingsToggle, SettingsStepper, SettingsPillGroup,
 } from './components/settings/SettingsSection'
+export {
+  scorePassword, PasswordStrengthMeter, SecurityScoreRing,
+  SecurityStepCard, DeviceRow, ActivityRow,
+} from './components/security/Security'
 export { default as GeminiAI } from './components/GeminiAI'
 export { default as KycModal } from './components/KycModal'
 export { default as PostDetailModal } from './components/PostDetailModal'
