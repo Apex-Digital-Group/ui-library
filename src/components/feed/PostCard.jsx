@@ -18,6 +18,10 @@ export default function PostCard({
   author = {},
   timeText,
   caption,
+  // CSS background for "colored text post" tiles (hex or gradient string,
+  // e.g. "#f5576c" or "linear-gradient(...)"). When set, the caption renders
+  // inside a full-width colored tile instead of the inline caption line.
+  background,
   interests = [],
   onInterestClick,
   pinned = false,
@@ -249,6 +253,14 @@ export default function PostCard({
       {/* Host-rendered exotic blocks (shared content, age-gate) */}
       {extraContent}
 
+      {/* Colored text post — the caption IS the visual, rendered as a full-width
+          tile in the media slot. Media wins if both are somehow present. */}
+      {background && !item ? (
+        <div className="bond-post-card__color-tile" style={{ background }} onClick={stop}>
+          <span>{caption}</span>
+        </div>
+      ) : null}
+
       {/* Media (square) */}
       {item ? (
         <div className={`bond-post-card__media ${locked.isLocked ? "bond-post-card__media--blur" : ""}`}>
@@ -292,7 +304,7 @@ export default function PostCard({
 
         {!item ? interestsBlock : null}
 
-        {caption ? (
+        {caption && !(background && !item) ? (
           <div className="bond-post-card__caption">
             {author.name ? <span className="bond-post-card__strong">{author.name} </span> : null}
             <span>{caption}</span>

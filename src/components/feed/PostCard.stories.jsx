@@ -57,6 +57,15 @@ export const Gallery = {
   args: { ...baseArgs, media: [{ type: "image", url: IMG }, { type: "image", url: IMG2 }, { type: "image", url: AVATAR }] },
 };
 
+export const ColoredTextPost = {
+  args: {
+    ...baseArgs,
+    media: [],
+    caption: "Hello World",
+    background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+  },
+};
+
 export const CommentsOpen = {
   render: (args) => {
     const [value, setValue] = React.useState("");
