@@ -523,3 +523,25 @@
   fill: #fff;
   stroke: #fff;
 }
+
+/* Colored text post tile — the caption rendered as the post's visual.
+   Mirrors the composer preview (CreatePostModal renderTextBackgroundTab):
+   tall tile, text TOP-anchored + horizontally centered, 32px bold white,
+   8px radius inset from the card edges. */
+.bond-post-card__color-tile {
+  min-height: 300px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 20px;
+  margin: 0 12px;
+  border-radius: 8px;
+  text-align: center;
+  color: #fff;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.25;
+  word-break: break-word;
+  background-size: cover;
+  background-position: center;
+}
