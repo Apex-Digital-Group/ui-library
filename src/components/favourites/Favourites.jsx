@@ -111,6 +111,7 @@ export function FavAlbumCard({
   photoCountText,
   premium = false,
   authorName,
+  authorAvatarUrl,
   savedAtText,
   onOpen,
   onRemove,
@@ -125,17 +126,20 @@ export function FavAlbumCard({
           </span>
         ) : null}
         {premium ? (
-          <span className="bond-fav-pill bond-fav-pill--top-right bond-fav-pill--premium">
+          <span className="bond-fav-pill bond-fav-pill--top-left bond-fav-pill--premium">
             <Lock size={12} /> Premium
           </span>
         ) : null}
+        <div className="bond-fav-media-remove">
+          <RemoveButton onRemove={onRemove} />
+        </div>
       </div>
       <div className="bond-fav-card__body">
         <span className="bond-fav-card__title">{title}</span>
         <div className="bond-fav-card__meta-row">
+          {authorAvatarUrl ? <img className="bond-fav-avatar bond-fav-avatar--sm" src={authorAvatarUrl} alt="" /> : null}
           {authorName ? <span className="bond-fav-card__meta">{authorName}</span> : null}
-          {savedAtText ? <span className="bond-fav-card__meta bond-fav-card__meta--dim">{savedAtText}</span> : null}
-          <RemoveButton onRemove={onRemove} />
+          {savedAtText ? <span className="bond-fav-card__meta bond-fav-card__meta--dim bond-fav-card__meta--right">{savedAtText}</span> : null}
         </div>
       </div>
     </div>
@@ -148,6 +152,7 @@ export function FavVideoCard({
   durationText,
   priceText,
   authorName,
+  authorAvatarUrl,
   onOpen,
   onRemove,
 }) {
@@ -155,17 +160,20 @@ export function FavVideoCard({
     <div className="bond-fav-card bond-fav-video">
       <div className="bond-fav-video__media" onClick={onOpen} role={onOpen ? "button" : undefined}>
         {thumbUrl ? <img src={thumbUrl} alt={title || "video"} loading="lazy" /> : <div className="bond-fav-media-fallback" />}
-        <span className="bond-fav-video__play"><Play size={18} fill="currentColor" /></span>
+        <span className="bond-fav-video__play"><Play size={16} fill="currentColor" /></span>
         {durationText ? (
           <span className="bond-fav-duration">{durationText}</span>
         ) : null}
+        <div className="bond-fav-media-remove">
+          <RemoveButton onRemove={onRemove} />
+        </div>
       </div>
       <div className="bond-fav-card__body">
         <span className="bond-fav-card__title">{title}</span>
         <div className="bond-fav-card__meta-row">
+          {authorAvatarUrl ? <img className="bond-fav-avatar bond-fav-avatar--sm" src={authorAvatarUrl} alt="" /> : null}
           {authorName ? <span className="bond-fav-card__meta">{authorName}</span> : null}
-          <span className="bond-fav-card__meta bond-fav-card__meta--dim">{priceText || "Free"}</span>
-          <RemoveButton onRemove={onRemove} />
+          <span className="bond-fav-price-pill bond-fav-card__meta--right">{priceText || "Free"}</span>
         </div>
       </div>
     </div>
