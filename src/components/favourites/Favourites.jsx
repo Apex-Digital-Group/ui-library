@@ -1,5 +1,5 @@
 import React from "react";
-import { Heart, Play, Images, Lock, Radio, Bookmark } from "lucide-react";
+import { Heart, Play, Images, Lock, Bookmark, BadgeCheck, MessageCircle } from "lucide-react";
 import ReactionStack, { REACTION_EMOJI } from "../feed/ReactionStack";
 import "./Favourites.css";
 
@@ -66,12 +66,16 @@ export function FavProfileCard({
   avatarUrl,
   coverUrl,
   isLive = false,
+  verified = false,
   subscribersText,
   onView,
+  onMessage,
   onRemove,
 }) {
   return (
     <div className="bond-fav-card bond-fav-profile">
+      {/* Tall portrait media with the identity row overlaid on a bottom
+          scrim, LIVE pill top-left, remove heart top-right — per the mock. */}
       <div className="bond-fav-profile__media" onClick={onView} role={onView ? "button" : undefined}>
         {coverUrl || avatarUrl ? (
           <img src={coverUrl || avatarUrl} alt={name || "profile"} loading="lazy" />
@@ -80,26 +84,35 @@ export function FavProfileCard({
         )}
         {isLive ? (
           <span className="bond-fav-live">
-            <Radio size={12} /> LIVE
+            <span className="bond-fav-live__dot" /> LIVE
           </span>
         ) : null}
-      </div>
-      <div className="bond-fav-card__body">
-        <div className="bond-fav-profile__identity">
-          {avatarUrl ? <img className="bond-fav-avatar" src={avatarUrl} alt="" /> : null}
+        <div className="bond-fav-media-remove">
+          <RemoveButton onRemove={onRemove} />
+        </div>
+        <div className="bond-fav-profile__scrim">
+          {avatarUrl ? <img className="bond-fav-avatar bond-fav-avatar--md" src={avatarUrl} alt="" /> : null}
           <div className="bond-fav-profile__names">
-            <span className="bond-fav-card__title">{name}</span>
+            <span className="bond-fav-card__title">
+              {name}
+              {verified ? <BadgeCheck size={15} className="bond-fav-verified" /> : null}
+            </span>
             {subscribersText ? (
               <span className="bond-fav-card__meta">{subscribersText}</span>
             ) : null}
           </div>
         </div>
-        <div className="bond-fav-profile__actions">
-          <button type="button" className="bond-fav-btn-primary" onClick={onView}>
-            View profile
+      </div>
+      <div className="bond-fav-profile__actions">
+        <button type="button" className="bond-fav-btn-primary" onClick={onView}>
+          View profile
+        </button>
+        {onMessage ? (
+          <button type="button" className="bond-fav-icon-btn" aria-label="Message"
+            onClick={(e) => { e.stopPropagation(); onMessage(); }}>
+            <MessageCircle size={17} />
           </button>
-          <RemoveButton onRemove={onRemove} />
-        </div>
+        ) : null}
       </div>
     </div>
   );
