@@ -13,6 +13,7 @@
     "./ModalHeader": "./src/components/ModalHeader.jsx",
     "./settings/SettingsSection": "./src/components/settings/SettingsSection.jsx",
     "./security/Security": "./src/components/security/Security.jsx",
+    "./favourites/Favourites": "./src/components/favourites/Favourites.jsx",
     "./feed/CommentsList": "./src/components/feed/CommentsList.jsx",
     "./feed/CommentsSection": "./src/components/feed/CommentsSection.jsx",
     "./feed/SuggestedForYou": "./src/components/feed/SuggestedForYou.jsx",
