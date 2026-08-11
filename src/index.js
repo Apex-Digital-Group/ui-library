@@ -141,6 +141,15 @@ export {
   scorePassword, PasswordStrengthMeter, SecurityScoreRing,
   SecurityStepCard, DeviceRow, ActivityRow,
 } from './components/security/Security'
+export {
+  FavTabs,
+  FavSectionHeader,
+  FavProfileCard,
+  FavAlbumCard,
+  FavVideoCard,
+  FavPostCard,
+  FavEmptyState,
+} from './components/favourites/Favourites'
 export { default as GeminiAI } from './components/GeminiAI'
 export { default as KycModal } from './components/KycModal'
 export { default as PostDetailModal } from './components/PostDetailModal'
