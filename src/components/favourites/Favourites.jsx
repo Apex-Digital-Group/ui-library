@@ -47,6 +47,7 @@ export function FavSectionHeader({ title, count }) {
       {typeof count === "number" ? (
         <span className="bond-fav-section-header__count">{count}</span>
       ) : null}
+      <span className="bond-fav-section-header__rule" />
     </div>
   );
 }
@@ -91,7 +92,13 @@ export function FavProfileCard({
           <RemoveButton onRemove={onRemove} />
         </div>
         <div className="bond-fav-profile__scrim">
-          {avatarUrl ? <img className="bond-fav-avatar bond-fav-avatar--md" src={avatarUrl} alt="" /> : null}
+          {avatarUrl ? (
+            <img className="bond-fav-avatar bond-fav-avatar--md" src={avatarUrl} alt="" />
+          ) : (
+            <span className="bond-fav-avatar bond-fav-avatar--md bond-fav-avatar--fallback">
+              {(name || "?").charAt(0).toUpperCase()}
+            </span>
+          )}
           <div className="bond-fav-profile__names">
             <span className="bond-fav-card__title">
               {name}

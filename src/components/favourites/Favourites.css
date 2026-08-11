@@ -54,9 +54,23 @@
   color: #fff;
 }
 .bond-fav-section-header__count {
-  font-size: 13.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 12.5px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.75);
+}
+.bond-fav-section-header__rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0));
 }
 
 /* --- shared card chrome --- */
@@ -212,6 +226,15 @@
 .bond-fav-avatar--md {
   width: 32px;
   height: 32px;
+}
+.bond-fav-avatar--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(140deg, #6d3ab0, #b3479a);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
 }
 .bond-fav-profile__names {
   display: flex;
