@@ -1,9 +1,7 @@
 import React from "react";
 import { Heart, Play, Images, Lock, Radio, Bookmark } from "lucide-react";
+import ReactionStack, { REACTION_EMOJI } from "../feed/ReactionStack";
 import "./Favourites.css";
-
-// Same 6 reactions as the feed (like/love/haha/wow/sad/angry).
-const REACTION_EMOJI = { like: "👍", love: "❤️", haha: "😂", wow: "😮", sad: "😢", angry: "😠" };
 
 /**
  * Favourites page building blocks (saved-items redesign).
@@ -236,11 +234,7 @@ export function FavPostCard({
         <div className="bond-fav-post__footer">
           {reactionEntries.length ? (
             <span className="bond-fav-card__meta" title={reactionEntries.map(([k, n]) => `${k}: ${n}`).join(", ")}>
-              <span className="bond-fav-post__reaction-stack">
-                {reactionEntries.slice(0, 3).map(([kind]) => (
-                  <span key={kind} className="bond-fav-post__reaction">{REACTION_EMOJI[kind]}</span>
-                ))}
-              </span>
+              <ReactionStack counts={reactionCounts} />
               {totalReactions}
             </span>
           ) : (

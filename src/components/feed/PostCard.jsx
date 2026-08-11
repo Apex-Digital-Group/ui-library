@@ -3,8 +3,7 @@ import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Lock } from "luci
 import "./PostCard.css";
 
 // 6 reactions, 1:1 with the host (like/love/haha/wow/sad/angry).
-const REACTION_EMOJI = { like: "👍", love: "❤️", haha: "😂", wow: "😮", sad: "😢", angry: "😠" };
-const REACTION_ORDER = ["like", "love", "haha", "wow", "sad", "angry"];
+import ReactionStack, { REACTION_EMOJI, REACTION_ORDER } from "./ReactionStack";
 
 /**
  * base44 PostCard — Instagram-style feed card matching base44's Feed page:
@@ -109,11 +108,7 @@ export default function PostCard({
   const reactionSummary = topReactionNames.length > 0 ? (
     <div className="bond-post-card__likes">
       <button type="button" className="bond-post-card__likes-btn bond-post-card__likes-btn--reactions" onClick={(e) => { stop(e); onOpenLikes && onOpenLikes(); }}>
-        <span className="bond-post-card__react-stack" aria-hidden>
-          {topReactionNames.map((name) => (
-            <span key={name} className="bond-post-card__react-emoji" title={name}>{REACTION_EMOJI[name]}</span>
-          ))}
-        </span>
+        <ReactionStack names={topReactionNames} max={topReactionNames.length} />
         <span className="bond-post-card__react-count">{reactionText}</span>
       </button>
       {comments.count > 0 ? <span className="bond-post-card__likes-comment-count">{comments.count} comments</span> : null}
