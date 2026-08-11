@@ -2,6 +2,9 @@ import React from "react";
 import { Heart, Play, Images, Lock, Radio, Bookmark } from "lucide-react";
 import "./Favourites.css";
 
+// Same 6 reactions as the feed (like/love/haha/wow/sad/angry).
+const REACTION_EMOJI = { like: "👍", love: "❤️", haha: "😂", wow: "😮", sad: "😢", angry: "😠" };
+
 /**
  * Favourites page building blocks (saved-items redesign).
  *
@@ -181,11 +184,21 @@ export function FavPostCard({
   media = null,
   tags = [],
   reactionCount = 0,
+  // Per-reaction counts ({like: 3, haha: 1, ...}) — when provided, the
+  // footer shows the ACTUAL top reactions as an emoji stack + total,
+  // like the feed, instead of a generic heart.
+  reactionCounts = null,
   commentCount = 0,
   onOpen,
   onRemove,
 }) {
   const hasMedia = Boolean(media && media.url);
+  const reactionEntries = Object.entries(reactionCounts || {})
+    .filter(([kind, n]) => REACTION_EMOJI[kind] && n > 0)
+    .sort((a, b) => b[1] - a[1]);
+  const totalReactions = reactionEntries.length
+    ? reactionEntries.reduce((acc, [, n]) => acc + n, 0)
+    : reactionCount;
   return (
     <div className="bond-fav-card bond-fav-post">
       {hasMedia ? (
@@ -221,7 +234,18 @@ export function FavPostCard({
           </div>
         ) : null}
         <div className="bond-fav-post__footer">
-          <span className="bond-fav-card__meta"><Heart size={14} /> {reactionCount}</span>
+          {reactionEntries.length ? (
+            <span className="bond-fav-card__meta" title={reactionEntries.map(([k, n]) => `${k}: ${n}`).join(", ")}>
+              <span className="bond-fav-post__reaction-stack">
+                {reactionEntries.slice(0, 3).map(([kind]) => (
+                  <span key={kind} className="bond-fav-post__reaction">{REACTION_EMOJI[kind]}</span>
+                ))}
+              </span>
+              {totalReactions}
+            </span>
+          ) : (
+            <span className="bond-fav-card__meta"><Heart size={14} /> {totalReactions}</span>
+          )}
           <span className="bond-fav-card__meta">💬 {commentCount}</span>
           <button type="button" className="bond-fav-open-link" onClick={onOpen}>
             Open post

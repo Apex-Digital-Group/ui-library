@@ -130,6 +130,23 @@ describe('FavPostCard', () => {
     expect(container.querySelector('.bond-fav-post__media video')).not.toBeNull()
   })
 
+  it('shows the actual reaction emoji stack sorted by count', () => {
+    const { container } = render(
+      <FavPostCard authorName="A" reactionCounts={{ haha: 1, like: 3, love: 2 }} commentCount={0} />
+    )
+    const stack = container.querySelector('.bond-fav-post__reaction-stack')
+    expect(stack).not.toBeNull()
+    const emojis = Array.from(stack.querySelectorAll('.bond-fav-post__reaction')).map((el) => el.textContent)
+    expect(emojis).toEqual(['\u{1F44D}', '\u2764\ufe0f', '\u{1F602}'])  // like(3), love(2), haha(1)
+    expect(screen.getByText('6')).toBeInTheDocument()  // total
+  })
+
+  it('falls back to the heart icon without per-reaction data', () => {
+    const { container } = render(<FavPostCard authorName="A" reactionCount={4} />)
+    expect(container.querySelector('.bond-fav-post__reaction-stack')).toBeNull()
+    expect(screen.getByText('4')).toBeInTheDocument()
+  })
+
   it('text-only posts have no media band and keep remove in the head', () => {
     const { container } = render(<FavPostCard authorName="A" body="text" onRemove={() => {}} />)
     expect(container.querySelector('.bond-fav-post__media')).toBeNull()
