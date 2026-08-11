@@ -109,6 +109,32 @@ describe('FavPostCard', () => {
     render(<FavPostCard authorName="A" tags={[{ id: 1, name: 'Ice Play' }]} />)
     expect(screen.getByText('Ice Play')).toBeInTheDocument()
   })
+
+  it('renders an image media band with the remove overlay', () => {
+    const onRemove = vi.fn()
+    const { container } = render(
+      <FavPostCard authorName="A" body="hi" media={{ type: 'image', url: 'x.jpg' }} onRemove={onRemove} />
+    )
+    const band = container.querySelector('.bond-fav-post__media')
+    expect(band).not.toBeNull()
+    expect(band.querySelector('img')).not.toBeNull()
+    // remove lives on the media overlay, not the head row
+    expect(container.querySelector('.bond-fav-post__media-remove .bond-fav-remove')).not.toBeNull()
+    expect(container.querySelector('.bond-fav-post__head .bond-fav-remove')).toBeNull()
+  })
+
+  it('renders a video element for video media', () => {
+    const { container } = render(
+      <FavPostCard authorName="A" media={{ type: 'video', url: 'x.webm' }} />
+    )
+    expect(container.querySelector('.bond-fav-post__media video')).not.toBeNull()
+  })
+
+  it('text-only posts have no media band and keep remove in the head', () => {
+    const { container } = render(<FavPostCard authorName="A" body="text" onRemove={() => {}} />)
+    expect(container.querySelector('.bond-fav-post__media')).toBeNull()
+    expect(container.querySelector('.bond-fav-post__head .bond-fav-remove')).not.toBeNull()
+  })
 })
 
 describe('FavEmptyState', () => {

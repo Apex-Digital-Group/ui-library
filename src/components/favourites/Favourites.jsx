@@ -176,22 +176,39 @@ export function FavPostCard({
   authorAvatarUrl,
   timeAgoText,
   body,
+  // Post media per the mock: a 4:3 band on top of the card when present
+  // ({type: "image"|"video", url}); text-only posts have no media area.
+  media = null,
   tags = [],
   reactionCount = 0,
   commentCount = 0,
   onOpen,
   onRemove,
 }) {
+  const hasMedia = Boolean(media && media.url);
   return (
     <div className="bond-fav-card bond-fav-post">
+      {hasMedia ? (
+        <div className="bond-fav-post__media" onClick={onOpen} role={onOpen ? "button" : undefined}>
+          {media.type === "video" ? (
+            <video src={media.url} muted loop playsInline autoPlay />
+          ) : (
+            <img src={media.url} alt="post media" loading="lazy" />
+          )}
+          {/* Mock overlays the remove heart on the media, top-right */}
+          <div className="bond-fav-post__media-remove">
+            <RemoveButton onRemove={onRemove} />
+          </div>
+        </div>
+      ) : null}
       <div className="bond-fav-card__body">
         <div className="bond-fav-post__head">
-          {authorAvatarUrl ? <img className="bond-fav-avatar" src={authorAvatarUrl} alt="" /> : null}
-          <div className="bond-fav-profile__names">
-            <span className="bond-fav-card__title">{authorName}</span>
-            {timeAgoText ? <span className="bond-fav-card__meta bond-fav-card__meta--dim">{timeAgoText}</span> : null}
-          </div>
-          <RemoveButton onRemove={onRemove} />
+          {authorAvatarUrl ? <img className="bond-fav-avatar bond-fav-avatar--sm" src={authorAvatarUrl} alt="" /> : null}
+          <span className="bond-fav-card__title">{authorName}</span>
+          {timeAgoText ? (
+            <span className="bond-fav-card__meta bond-fav-card__meta--dim bond-fav-post__time">{timeAgoText}</span>
+          ) : null}
+          {!hasMedia ? <RemoveButton onRemove={onRemove} /> : null}
         </div>
         {body ? <p className="bond-fav-post__body">{body}</p> : null}
         {tags.length ? (
