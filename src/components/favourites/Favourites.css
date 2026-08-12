@@ -188,7 +188,7 @@
   aspect-ratio: 5 / 7;
   cursor: pointer;
 }
-.bond-fav-profile__media img {
+.bond-fav-profile__media > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -248,7 +248,7 @@
 .bond-fav-icon-btn:hover {
   background: rgba(255, 255, 255, 0.14);
 }
-.bond-fav-avatar--md {
+.bond-fav-avatar.bond-fav-avatar--md {
   width: 32px;
   height: 32px;
 }
@@ -287,8 +287,8 @@
   aspect-ratio: 4 / 3;
   cursor: pointer;
 }
-.bond-fav-album__media img,
-.bond-fav-video__media img {
+.bond-fav-album__media > img,
+.bond-fav-video__media > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -460,8 +460,8 @@
   background: #1a0f2c;
   cursor: pointer;
 }
-.bond-fav-post__media img,
-.bond-fav-post__media video {
+.bond-fav-post__media > img,
+.bond-fav-post__media > video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -481,7 +481,7 @@
   background: rgba(12, 7, 22, 0.65);
   border-color: rgba(255, 255, 255, 0.18);
 }
-.bond-fav-avatar--sm {
+.bond-fav-avatar.bond-fav-avatar--sm {
   width: 26px;
   height: 26px;
 }
