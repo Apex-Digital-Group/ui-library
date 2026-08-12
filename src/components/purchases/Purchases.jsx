@@ -21,8 +21,21 @@ function initialOf(name) {
   return (name || "?").trim().charAt(0).toUpperCase();
 }
 
+// Media that may 404 (deleted/missing files) degrades to the gradient
+// placeholder instead of the browser's broken-image glyph + alt text.
+function ThumbImg({ url, alt }) {
+  const [broken, setBroken] = React.useState(false);
+  React.useEffect(() => setBroken(false), [url]);
+  if (!url || broken) return <div className="bond-pur-item__thumb-fallback" />;
+  return <img src={url} alt={alt} loading="lazy" onError={() => setBroken(true)} />;
+}
+
 function AvatarCircle({ url, name, size = "md" }) {
-  if (url) return <img className={`bond-pur-avatar bond-pur-avatar--${size}`} src={url} alt="" />;
+  const [broken, setBroken] = React.useState(false);
+  React.useEffect(() => setBroken(false), [url]);
+  if (url && !broken) {
+    return <img className={`bond-pur-avatar bond-pur-avatar--${size}`} src={url} alt="" onError={() => setBroken(true)} />;
+  }
   return (
     <span className={`bond-pur-avatar bond-pur-avatar--${size} bond-pur-avatar--fallback`}>
       {initialOf(name)}
@@ -117,7 +130,7 @@ export function PurchaseItemCard({
   return (
     <div className="bond-pur-card bond-pur-item">
       <div className="bond-pur-item__thumb" onClick={onOpen} role={onOpen ? "button" : undefined}>
-        {thumbUrl ? <img src={thumbUrl} alt={title || "purchase"} loading="lazy" /> : <div className="bond-pur-item__thumb-fallback" />}
+        <ThumbImg url={thumbUrl} alt={title || "purchase"} />
         {statusBadge ? (
           <span className="bond-pur-pill bond-pur-pill--status">{statusBadge}</span>
         ) : typeBadge ? (

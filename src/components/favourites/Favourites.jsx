@@ -52,6 +52,28 @@ export function FavSectionHeader({ title, count }) {
   );
 }
 
+// Media that may 404 (deleted/missing files) degrades to the gradient
+// fallback instead of the browser's broken-image glyph + alt text.
+function MediaImg({ url, alt, className }) {
+  const [broken, setBroken] = React.useState(false);
+  React.useEffect(() => setBroken(false), [url]);
+  if (!url || broken) return <div className="bond-fav-media-fallback" />;
+  return <img className={className} src={url} alt={alt} loading="lazy" onError={() => setBroken(true)} />;
+}
+
+function AvatarImg({ url, name, className }) {
+  const [broken, setBroken] = React.useState(false);
+  React.useEffect(() => setBroken(false), [url]);
+  if (url && !broken) {
+    return <img className={className} src={url} alt="" onError={() => setBroken(true)} />;
+  }
+  return (
+    <span className={`${className} bond-fav-avatar--fallback`}>
+      {(name || "?").trim().charAt(0).toUpperCase()}
+    </span>
+  );
+}
+
 function RemoveButton({ onRemove, label = "Remove from favourites" }) {
   if (!onRemove) return null;
   return (
@@ -78,11 +100,7 @@ export function FavProfileCard({
       {/* Tall portrait media with the identity row overlaid on a bottom
           scrim, LIVE pill top-left, remove heart top-right — per the mock. */}
       <div className="bond-fav-profile__media" onClick={onView} role={onView ? "button" : undefined}>
-        {coverUrl || avatarUrl ? (
-          <img src={coverUrl || avatarUrl} alt={name || "profile"} loading="lazy" />
-        ) : (
-          <div className="bond-fav-media-fallback" />
-        )}
+        <MediaImg url={coverUrl || avatarUrl} alt={name || "profile"} />
         {isLive ? (
           <span className="bond-fav-live">
             <span className="bond-fav-live__dot" /> LIVE
@@ -92,13 +110,7 @@ export function FavProfileCard({
           <RemoveButton onRemove={onRemove} />
         </div>
         <div className="bond-fav-profile__scrim">
-          {avatarUrl ? (
-            <img className="bond-fav-avatar bond-fav-avatar--md" src={avatarUrl} alt="" />
-          ) : (
-            <span className="bond-fav-avatar bond-fav-avatar--md bond-fav-avatar--fallback">
-              {(name || "?").charAt(0).toUpperCase()}
-            </span>
-          )}
+          <AvatarImg url={avatarUrl} name={name} className="bond-fav-avatar bond-fav-avatar--md" />
           <div className="bond-fav-profile__names">
             <span className="bond-fav-card__title">
               {name}
@@ -139,7 +151,7 @@ export function FavAlbumCard({
   return (
     <div className="bond-fav-card bond-fav-album">
       <div className="bond-fav-album__media" onClick={onOpen} role={onOpen ? "button" : undefined}>
-        {coverUrl ? <img src={coverUrl} alt={title || "album"} loading="lazy" /> : <div className="bond-fav-media-fallback" />}
+        <MediaImg url={coverUrl} alt={title || "album"} />
         {photoCountText ? (
           <span className="bond-fav-pill bond-fav-pill--bottom-left">
             <Images size={13} /> {photoCountText}
@@ -157,7 +169,7 @@ export function FavAlbumCard({
       <div className="bond-fav-card__body">
         <span className="bond-fav-card__title">{title}</span>
         <div className="bond-fav-card__meta-row">
-          {authorAvatarUrl ? <img className="bond-fav-avatar bond-fav-avatar--sm" src={authorAvatarUrl} alt="" /> : null}
+          <AvatarImg url={authorAvatarUrl} name={authorName} className="bond-fav-avatar bond-fav-avatar--sm" />
           {authorName ? <span className="bond-fav-card__meta">{authorName}</span> : null}
           {savedAtText ? <span className="bond-fav-card__meta bond-fav-card__meta--dim bond-fav-card__meta--right">{savedAtText}</span> : null}
         </div>
@@ -179,7 +191,7 @@ export function FavVideoCard({
   return (
     <div className="bond-fav-card bond-fav-video">
       <div className="bond-fav-video__media" onClick={onOpen} role={onOpen ? "button" : undefined}>
-        {thumbUrl ? <img src={thumbUrl} alt={title || "video"} loading="lazy" /> : <div className="bond-fav-media-fallback" />}
+        <MediaImg url={thumbUrl} alt={title || "video"} />
         <span className="bond-fav-video__play"><Play size={16} fill="currentColor" /></span>
         {durationText ? (
           <span className="bond-fav-duration">{durationText}</span>
@@ -191,7 +203,7 @@ export function FavVideoCard({
       <div className="bond-fav-card__body">
         <span className="bond-fav-card__title">{title}</span>
         <div className="bond-fav-card__meta-row">
-          {authorAvatarUrl ? <img className="bond-fav-avatar bond-fav-avatar--sm" src={authorAvatarUrl} alt="" /> : null}
+          <AvatarImg url={authorAvatarUrl} name={authorName} className="bond-fav-avatar bond-fav-avatar--sm" />
           {authorName ? <span className="bond-fav-card__meta">{authorName}</span> : null}
           <span className="bond-fav-price-pill bond-fav-card__meta--right">{priceText || "Free"}</span>
         </div>
@@ -232,7 +244,7 @@ export function FavPostCard({
           {media.type === "video" ? (
             <video src={media.url} muted loop playsInline autoPlay />
           ) : (
-            <img src={media.url} alt="post media" loading="lazy" />
+            <MediaImg url={media.url} alt="post media" />
           )}
           {/* Mock overlays the remove heart on the media, top-right */}
           <div className="bond-fav-post__media-remove">
@@ -242,7 +254,7 @@ export function FavPostCard({
       ) : null}
       <div className="bond-fav-card__body">
         <div className="bond-fav-post__head">
-          {authorAvatarUrl ? <img className="bond-fav-avatar bond-fav-avatar--sm" src={authorAvatarUrl} alt="" /> : null}
+          <AvatarImg url={authorAvatarUrl} name={authorName} className="bond-fav-avatar bond-fav-avatar--sm" />
           <span className="bond-fav-card__title">{authorName}</span>
           {timeAgoText ? (
             <span className="bond-fav-card__meta bond-fav-card__meta--dim bond-fav-post__time">{timeAgoText}</span>
