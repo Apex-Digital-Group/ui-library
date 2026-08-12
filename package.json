@@ -14,6 +14,7 @@
     "./settings/SettingsSection": "./src/components/settings/SettingsSection.jsx",
     "./security/Security": "./src/components/security/Security.jsx",
     "./favourites/Favourites": "./src/components/favourites/Favourites.jsx",
+    "./purchases/Purchases": "./src/components/purchases/Purchases.jsx",
     "./feed/CommentsList": "./src/components/feed/CommentsList.jsx",
     "./feed/CommentsSection": "./src/components/feed/CommentsSection.jsx",
     "./feed/SuggestedForYou": "./src/components/feed/SuggestedForYou.jsx",

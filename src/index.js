@@ -150,6 +150,11 @@ export {
   FavPostCard,
   FavEmptyState,
 } from './components/favourites/Favourites'
+export {
+  PurchaseStatCard,
+  SubscriptionCard,
+  PurchaseItemCard,
+} from './components/purchases/Purchases'
 export { default as GeminiAI } from './components/GeminiAI'
 export { default as KycModal } from './components/KycModal'
 export { default as PostDetailModal } from './components/PostDetailModal'
