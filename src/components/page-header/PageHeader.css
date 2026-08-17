@@ -39,6 +39,11 @@
 }
 
 .bond-page-header__title {
+  /* fit-content: the gradient maps to the TEXT width, so short titles still
+     sweep cyan -> magenta instead of sitting in the cyan end of a full-width
+     gradient. */
+  width: fit-content;
+  max-width: 100%;
   margin: 0 0 6px;
   font-weight: 800;
   letter-spacing: -0.01em;
