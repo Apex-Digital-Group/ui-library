@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "description": "Bond shared component library — base44 design system ported for incremental adoption across frontends.",
+  "description": "Bond shared component library \u2014 base44 design system ported for incremental adoption across frontends.",
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js",
@@ -38,7 +38,8 @@
     "./credits/CreditInfoNote": "./src/components/credits/CreditInfoNote.jsx",
     "./styles.css": "./src/styles.css",
     "./typography.css": "./src/typography.css",
-    "./tailwind-preset": "./tailwind.preset.js"
+    "./tailwind-preset": "./tailwind.preset.js",
+    "./page-header/PageHeader": "./src/components/page-header/PageHeader.jsx"
   },
   "scripts": {
     "dev": "vite",
