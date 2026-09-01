@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
+import { UploadCloud } from 'lucide-react'
 import ModalHeader from './ModalHeader'
 
 describe('ModalHeader', () => {
@@ -15,7 +16,7 @@ describe('ModalHeader', () => {
     expect(screen.getByText('Monthly summary')).toBeDefined()
   })
 
-  it('fires onClose from the ghost close button', () => {
+  it('fires onClose from the circular close button', () => {
     const onClose = vi.fn()
     render(<ModalHeader title="T" onClose={onClose} />)
     fireEvent.click(screen.getByLabelText('Close'))
@@ -25,5 +26,17 @@ describe('ModalHeader', () => {
   it('omits the close button when onClose is not provided', () => {
     render(<ModalHeader title="Processing…" />)
     expect(screen.queryByLabelText('Close')).toBeNull()
+  })
+
+  it('renders the gradient accent strip by default and drops it with accent={false}', () => {
+    const { container, rerender } = render(<ModalHeader title="T" />)
+    expect(container.querySelector('.top-0.h-\\[3px\\]')).not.toBeNull()
+    rerender(<ModalHeader title="T" accent={false} />)
+    expect(container.querySelector('.top-0.h-\\[3px\\]')).toBeNull()
+  })
+
+  it('renders a gradient icon chip when icon is passed', () => {
+    const { container } = render(<ModalHeader title="Upload Video" icon={UploadCloud} />)
+    expect(container.querySelector('.rounded-\\[14px\\] svg')).not.toBeNull()
   })
 })
