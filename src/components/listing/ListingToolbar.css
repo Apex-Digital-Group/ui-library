@@ -273,6 +273,31 @@
   filter: none;
 }
 
+/* ── Touch devices: meet the ~40px tap-target floor without changing the
+   pointer-device look. Icons and colours stay identical; only hit areas
+   grow. ── */
+@media (pointer: coarse) {
+  .bond-ltb__search,
+  .bond-ltb__select-btn {
+    min-height: 40px;
+  }
+  .bond-ltb__toggle button {
+    min-width: 40px;
+    min-height: 32px; /* + the group's 4px padding = 40px-tall target */
+  }
+  .bond-ltb__icon-btn {
+    width: 40px;
+    height: 40px;
+  }
+  .bond-ltb__search-clear {
+    padding: 8px;
+    margin: -4px; /* bigger hit area, same visual footprint */
+  }
+  .bond-ltb__select-item {
+    padding: 11px 12px;
+  }
+}
+
 /* ── Mobile: wrap instead of overflowing; search takes the full row ── */
 @media (max-width: 720px) {
   .bond-ltb {

@@ -79,6 +79,9 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+  /* When the row wraps (tablet widths) the actions land on their own line;
+     keep them docked to the right edge like the unwrapped desktop layout. */
+  margin-left: auto;
 }
 
 @media (max-width: 640px) {
@@ -86,5 +89,11 @@
     align-items: flex-start;
     flex-direction: column;
     padding: 18px;
+  }
+  /* Stacked card: actions span the full card width so an embedded toolbar's
+     search can take the whole row. */
+  .bond-page-header__actions {
+    margin-left: 0;
+    width: 100%;
   }
 }
