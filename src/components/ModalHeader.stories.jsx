@@ -42,13 +42,13 @@ export default {
   argTypes: { onClose: { action: "close" } },
 };
 
+/** The full client-reference lockup: icon chip + title + step subtitle. */
 export const Default = {
-  args: { title: "Start Video Call" },
+  args: { title: "Upload Video", subtitle: "Step 1 of 6 · Upload Video", icon: UploadCloud },
 };
 
-/** The full client-reference lockup: icon chip + title + step subtitle. */
-export const WizardStyle = {
-  args: { title: "Upload Video", subtitle: "Step 1 of 6 · Upload Video", icon: UploadCloud },
+export const TitleOnly = {
+  args: { title: "Start Video Call" },
 };
 
 export const CoverPicker = {
