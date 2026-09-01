@@ -30,13 +30,13 @@ describe('ModalHeader', () => {
 
   it('renders the gradient accent strip by default and drops it with accent={false}', () => {
     const { container, rerender } = render(<ModalHeader title="T" />)
-    expect(container.querySelector('.top-0.h-\\[3px\\]')).not.toBeNull()
+    expect(container.querySelector('.bond-mh__accent')).not.toBeNull()
     rerender(<ModalHeader title="T" accent={false} />)
-    expect(container.querySelector('.top-0.h-\\[3px\\]')).toBeNull()
+    expect(container.querySelector('.bond-mh__accent')).toBeNull()
   })
 
   it('renders a gradient icon chip when icon is passed', () => {
     const { container } = render(<ModalHeader title="Upload Video" icon={UploadCloud} />)
-    expect(container.querySelector('.rounded-\\[14px\\] svg')).not.toBeNull()
+    expect(container.querySelector('.bond-mh__icon svg')).not.toBeNull()
   })
 })

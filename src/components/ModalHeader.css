@@ -1,0 +1,80 @@
+/* ModalHeader — canonical wizard-style header (2026-09-01). Plain CSS like
+   every other lib component: consumers don't run Tailwind over lib sources,
+   so utility classes here would silently not exist in the app. */
+
+.bond-mh {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 16px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(120, 92, 180, 0.22);
+}
+
+/* Pinned to the modal card's top edge: positions against the nearest
+   containing block (the card's `relative`, or the transform it animates
+   with), clipped by the card's overflow + border-radius. */
+.bond-mh__accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #22d3ee, #a855f7 45%, #ec4899);
+}
+
+.bond-mh__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: linear-gradient(135deg, #22d3ee, #a855f7 55%, #ec4899);
+  box-shadow: 0 8px 22px rgba(168, 85, 247, 0.35);
+}
+
+.bond-mh__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.bond-mh__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-transform: none;
+}
+
+.bond-mh__sub {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: rgba(214, 205, 240, 0.6);
+}
+
+/* Same recipe as .lgw-close / .credit-popup-close. */
+.bond-mh__close {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  color: #fff;
+  border: 1px solid rgba(120, 92, 180, 0.22);
+  background: rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+.bond-mh__close:hover {
+  background: rgba(235, 64, 122, 0.3);
+  border-color: rgba(235, 64, 122, 0.5);
+  transform: rotate(90deg);
+}

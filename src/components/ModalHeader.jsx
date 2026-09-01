@@ -1,5 +1,6 @@
 import * as React from "react";
 import { X } from "lucide-react";
+import "./ModalHeader.css";
 
 /**
  * ModalHeader — the canonical modal header (2026-09-01 redesign, matched to
@@ -16,47 +17,27 @@ import { X } from "lucide-react";
  *  - 36px circular close button: dark glass at rest, pink + 90° rotate on
  *    hover (same recipe as .lgw-close / .credit-popup-close).
  *
- * The app mirrors this styling for antd modals via its global skin
- * (interactive-twin index.css); lib-composed modals use this component
- * directly above their content.
+ * Styled with its own CSS (bond-mh*) like every lib component — consumers
+ * don't run Tailwind over lib sources.
  *
  *   <ModalHeader title="Upload Video" subtitle="Step 1 of 6" icon={UploadCloud} onClose={close} />
  *   <ModalHeader title="Update cover" onClose={close} />
  */
 export default function ModalHeader({ title, subtitle, icon: Icon, onClose, accent = true, className = "" }) {
   return (
-    <div
-      className={`flex items-center gap-[14px] pb-[16px] mb-[14px] border-b border-[rgba(120,92,180,0.22)] ${className}`.trim()}
-    >
-      {accent ? (
-        <span
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-[3px] bg-[linear-gradient(90deg,#22d3ee,#a855f7_45%,#ec4899)]"
-        />
-      ) : null}
+    <div className={`bond-mh ${className}`.trim()}>
+      {accent ? <span aria-hidden="true" className="bond-mh__accent" /> : null}
       {Icon ? (
-        <span
-          aria-hidden="true"
-          className="flex h-[46px] w-[46px] flex-shrink-0 items-center justify-center rounded-[14px] text-white bg-[linear-gradient(135deg,#22d3ee,#a855f7_55%,#ec4899)] shadow-[0_8px_22px_rgba(168,85,247,0.35)]"
-        >
+        <span aria-hidden="true" className="bond-mh__icon">
           {React.isValidElement(Icon) ? Icon : <Icon size={22} />}
         </span>
       ) : null}
-      <div className="min-w-0 flex-1">
-        <h2 className="m-0! text-[22px]! font-extrabold! leading-[1.15]! tracking-[-0.01em] text-white!">
-          {title}
-        </h2>
-        {subtitle ? (
-          <p className="m-0! mt-[2px]! text-[13px]! text-[rgba(214,205,240,0.6)]!">{subtitle}</p>
-        ) : null}
+      <div className="bond-mh__body">
+        <h2 className="bond-mh__title">{title}</h2>
+        {subtitle ? <p className="bond-mh__sub">{subtitle}</p> : null}
       </div>
       {onClose ? (
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={onClose}
-          className="flex h-[36px] w-[36px] flex-shrink-0 items-center justify-center rounded-full border border-[rgba(120,92,180,0.22)] bg-black/30 text-white transition-all duration-300 hover:bg-[rgba(235,64,122,0.3)] hover:border-[rgba(235,64,122,0.5)] hover:rotate-90 cursor-pointer"
-        >
+        <button type="button" aria-label="Close" onClick={onClose} className="bond-mh__close">
           <X size={18} />
         </button>
       ) : null}
