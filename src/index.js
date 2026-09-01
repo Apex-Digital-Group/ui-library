@@ -104,6 +104,7 @@ export { default as StatusBadge } from './components/groups/StatusBadge'
 
 // listing pages (groups / videos / galleries view-alls)
 export { default as ListingToolbar } from './components/listing/ListingToolbar'
+export { default as ListingPageHeader } from './components/page-header/ListingPageHeader'
 
 // agency screens / panels
 export { default as AgencySettingsScreen } from './components/agency/AgencySettingsScreen'

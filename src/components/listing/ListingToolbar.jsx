@@ -25,6 +25,9 @@ function ListingToolbar({ variant = "page", sticky = false, className = "", chil
   const cls = [
     "bond-ltb",
     variant === "subnav" ? "bond-ltb--subnav" : "",
+    // embedded: bare control row for hosts that already own the surface
+    // (PageHeader's actions slot) — no background, border or margin.
+    variant === "embedded" ? "bond-ltb--embedded" : "",
     sticky ? "bond-ltb--sticky" : "",
     className,
   ].filter(Boolean).join(" ");
