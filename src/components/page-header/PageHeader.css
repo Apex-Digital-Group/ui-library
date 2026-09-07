@@ -38,6 +38,35 @@
   flex: 1 1 auto;
 }
 
+/* Icon chip — same 46px gradient lockup as ModalHeader's wizard chip, so
+   headers and modals share one visual language. Vertically centred against
+   the copy block; the card keeps its flex-end baseline for the actions. */
+.bond-page-header--with-icon {
+  align-items: center;
+}
+.bond-page-header__icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #22d3ee, #a855f7 55%, #ec4899);
+  color: #fff;
+  box-shadow: 0 8px 22px rgba(168, 85, 247, 0.35);
+}
+
+/* Eyebrow — small uppercase label above the title ("Saved by you"). */
+.bond-page-header__eyebrow {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bph-muted);
+}
+
 .bond-page-header__title {
   /* fit-content: the gradient maps to the TEXT width, so short titles still
      sweep cyan -> magenta instead of sitting in the cyan end of a full-width

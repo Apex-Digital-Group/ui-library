@@ -44,4 +44,23 @@ describe("PageHeader", () => {
     );
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
+
+  it("renders the eyebrow above the title and the icon chip when given", () => {
+    const Icon = (props) => <svg data-testid="ic" {...props} />;
+    const { container } = render(
+      <PageHeader title="Saved videos" eyebrow="Saved by you" icon={Icon} />
+    );
+    const eyebrow = container.querySelector(".bond-page-header__eyebrow");
+    expect(eyebrow).toHaveTextContent("Saved by you");
+    // eyebrow precedes the H1 in the copy block
+    expect(eyebrow.nextElementSibling.tagName).toBe("H1");
+    expect(container.querySelector(".bond-page-header__icon svg")).toBeTruthy();
+    expect(container.firstChild.className).toContain("bond-page-header--with-icon");
+  });
+
+  it("renders no chip or eyebrow by default", () => {
+    const { container } = render(<PageHeader title="T" />);
+    expect(container.querySelector(".bond-page-header__icon")).toBeNull();
+    expect(container.querySelector(".bond-page-header__eyebrow")).toBeNull();
+  });
 });

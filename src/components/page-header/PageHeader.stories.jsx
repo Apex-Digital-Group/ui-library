@@ -1,4 +1,5 @@
 import PageHeader from "./PageHeader";
+import { Bookmark } from "lucide-react";
 
 export default {
   title: "Components/PageHeader",
@@ -63,5 +64,17 @@ export const PlainNoCard = {
     title: "My Custom Clip Orders",
     size: "md",
     plain: true,
+  },
+};
+
+/* Client ask (2026-09-07): icon chip + "Saved by you" eyebrow above the
+   title — same gradient chip lockup as ModalHeader's wizard header. */
+export const IconAndEyebrow = {
+  args: {
+    title: "Saved videos",
+    subtitle: "Everything you bookmarked, in one place.",
+    eyebrow: "Saved by you",
+    icon: Bookmark,
+    size: "md",
   },
 };
