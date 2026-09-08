@@ -23,6 +23,8 @@ import "./PageHeader.css";
  *  - icon        (lucide component) — small inline icon at the START of the
  *                eyebrow line (the saved-items "❤ SAVED BY YOU" lockup);
  *                renders only when `eyebrow` is present
+ *  - iconProps   (object) — extra props for the icon (e.g. fill="currentColor"
+ *                for solid glyphs like the saved-items heart)
  *  - actions     (node) — right-hand slot (buttons, search, anything)
  *  - size        ('md' | 'lg') — md = 23px page standard, lg = the /feature
  *                clamp(22px…30px) hero scale. Default 'lg'.
@@ -35,6 +37,7 @@ export default function PageHeader({
   subtitle,
   eyebrow,
   icon: Icon,
+  iconProps = {},
   actions,
   size = "lg",
   plain = false,
@@ -54,7 +57,7 @@ export default function PageHeader({
         {eyebrow ? (
           <p className="bond-page-header__eyebrow">
             {Icon ? (
-              <Icon aria-hidden="true" size={14}
+              <Icon aria-hidden="true" size={14} {...iconProps}
                     className="bond-page-header__eyebrow-icon" />
             ) : null}
             {eyebrow}

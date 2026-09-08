@@ -54,7 +54,9 @@
 .bond-page-header__eyebrow-icon {
   flex: 0 0 auto;
   color: var(--bph-magenta);
-  fill: var(--bph-magenta);
+  /* fill is decided per icon by the caller (fill=currentColor for glyphs
+     meant to be solid, like the saved-items heart) — forcing it here turned
+     outline icons (camera, video, users…) into blobs. */
 }
 
 .bond-page-header__title {
