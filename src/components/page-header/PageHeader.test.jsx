@@ -45,17 +45,24 @@ describe("PageHeader", () => {
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
 
-  it("renders the eyebrow above the title and the icon chip when given", () => {
+  it("renders the eyebrow above the title with the icon inline at its start", () => {
     const Icon = (props) => <svg data-testid="ic" {...props} />;
     const { container } = render(
       <PageHeader title="Saved videos" eyebrow="Saved by you" icon={Icon} />
     );
     const eyebrow = container.querySelector(".bond-page-header__eyebrow");
     expect(eyebrow).toHaveTextContent("Saved by you");
-    // eyebrow precedes the H1 in the copy block
+    // eyebrow precedes the H1, and the icon sits INSIDE the eyebrow line
     expect(eyebrow.nextElementSibling.tagName).toBe("H1");
-    expect(container.querySelector(".bond-page-header__icon svg")).toBeTruthy();
-    expect(container.firstChild.className).toContain("bond-page-header--with-icon");
+    expect(eyebrow.querySelector(".bond-page-header__eyebrow-icon")).toBeTruthy();
+    // no separate chip outside the copy block
+    expect(container.querySelector(".bond-page-header__icon")).toBeNull();
+  });
+
+  it("icon without an eyebrow renders nothing extra", () => {
+    const Icon = (props) => <svg {...props} />;
+    const { container } = render(<PageHeader title="T" icon={Icon} />);
+    expect(container.querySelector("svg")).toBeNull();
   });
 
   it("renders no chip or eyebrow by default", () => {
