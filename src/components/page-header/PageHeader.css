@@ -87,6 +87,13 @@
   font-weight: 600;
 }
 
+/* White title variant (menu-driven header cards) — drop the gradient. */
+.bond-page-header--white-title .bond-page-header__title {
+  background: none;
+  -webkit-text-fill-color: #fff;
+  color: #fff;
+}
+
 .bond-page-header__subtitle {
   margin: 0;
   font-size: 14px;

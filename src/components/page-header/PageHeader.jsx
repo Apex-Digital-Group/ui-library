@@ -30,6 +30,8 @@ import "./PageHeader.css";
  *                clamp(22px…30px) hero scale. Default 'lg'.
  *  - plain       (bool) — drop the glass card (bare title block) for pages
  *                whose design has no hero panel. Default false.
+ *  - whiteTitle   (bool) — render the title in white instead of the
+ *                cyan→magenta gradient. Default false.
  *  - className   — extra classes on the root
  */
 export default function PageHeader({
@@ -41,6 +43,7 @@ export default function PageHeader({
   actions,
   size = "lg",
   plain = false,
+  whiteTitle = false,
   className = "",
   children,
 }) {
@@ -50,6 +53,7 @@ export default function PageHeader({
         "bond-page-header",
         `bond-page-header--${size}`,
         plain ? "bond-page-header--plain" : "",
+        whiteTitle ? "bond-page-header--white-title" : "",
         className,
       ].filter(Boolean).join(" ")}
     >

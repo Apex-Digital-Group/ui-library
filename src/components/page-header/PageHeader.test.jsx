@@ -70,4 +70,9 @@ describe("PageHeader", () => {
     expect(container.querySelector(".bond-page-header__icon")).toBeNull();
     expect(container.querySelector(".bond-page-header__eyebrow")).toBeNull();
   });
+
+  it("whiteTitle drops the gradient class onto the root", () => {
+    const { container } = render(<PageHeader title="T" whiteTitle />);
+    expect(container.firstChild.className).toContain("bond-page-header--white-title");
+  });
 });
