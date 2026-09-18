@@ -28,6 +28,8 @@ import ListingToolbar from "../listing/ListingToolbar";
 export default function ListingPageHeader({
   title,
   subtitle,
+  eyebrow,
+  icon,
   size = "md",
   plain = false,
   className = "",
@@ -38,6 +40,8 @@ export default function ListingPageHeader({
     <PageHeader
       title={title}
       subtitle={subtitle}
+      eyebrow={eyebrow}
+      icon={icon}
       size={size}
       plain={plain}
       className={["bond-listing-page-header", className].filter(Boolean).join(" ")}

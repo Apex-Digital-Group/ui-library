@@ -18,19 +18,32 @@ import "./PageHeader.css";
  * Props:
  *  - title       (string|node, required) — rendered inside the <h1>
  *  - subtitle    (string|node) — muted line under the title
+ *  - eyebrow     (string|node) — small uppercase label ABOVE the title
+ *                ("Saved by you") — pairs with `icon`
+ *  - icon        (lucide component) — small inline icon at the START of the
+ *                eyebrow line (the saved-items "❤ SAVED BY YOU" lockup);
+ *                renders only when `eyebrow` is present
+ *  - iconProps   (object) — extra props for the icon (e.g. fill="currentColor"
+ *                for solid glyphs like the saved-items heart)
  *  - actions     (node) — right-hand slot (buttons, search, anything)
  *  - size        ('md' | 'lg') — md = 23px page standard, lg = the /feature
  *                clamp(22px…30px) hero scale. Default 'lg'.
  *  - plain       (bool) — drop the glass card (bare title block) for pages
  *                whose design has no hero panel. Default false.
+ *  - whiteTitle   (bool) — render the title in white instead of the
+ *                cyan→magenta gradient. Default false.
  *  - className   — extra classes on the root
  */
 export default function PageHeader({
   title,
   subtitle,
+  eyebrow,
+  icon: Icon,
+  iconProps = {},
   actions,
   size = "lg",
   plain = false,
+  whiteTitle = false,
   className = "",
   children,
 }) {
@@ -40,10 +53,20 @@ export default function PageHeader({
         "bond-page-header",
         `bond-page-header--${size}`,
         plain ? "bond-page-header--plain" : "",
+        whiteTitle ? "bond-page-header--white-title" : "",
         className,
       ].filter(Boolean).join(" ")}
     >
       <div className="bond-page-header__copy">
+        {eyebrow ? (
+          <p className="bond-page-header__eyebrow">
+            {Icon ? (
+              <Icon aria-hidden="true" size={14} {...iconProps}
+                    className="bond-page-header__eyebrow-icon" />
+            ) : null}
+            {eyebrow}
+          </p>
+        ) : null}
         <h1 className="bond-page-header__title">{title}</h1>
         {subtitle ? <p className="bond-page-header__subtitle">{subtitle}</p> : null}
       </div>

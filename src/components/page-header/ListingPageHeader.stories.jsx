@@ -1,6 +1,7 @@
 import * as React from "react";
 import ListingPageHeader from "./ListingPageHeader";
 import ListingToolbar from "../listing/ListingToolbar";
+import { Bookmark } from "lucide-react";
 
 export default {
   title: "Page chrome/ListingPageHeader",
@@ -52,3 +53,24 @@ export function TitleOnly() {
     />
   );
 }
+
+/* The full client composition: icon chip + eyebrow + copy on the left,
+   page-injectable controls (search / sort / layout toggle) docked right. */
+export const SavedByYou = {
+  render: () => (
+    <ListingPageHeader
+      title="Saved videos"
+      subtitle="Everything you bookmarked, in one place."
+      eyebrow="Saved by you"
+      icon={Bookmark}
+    >
+      <ListingToolbar.Search placeholder="Search Videos" onCommit={() => {}} />
+      <ListingToolbar.Select
+        value="recent"
+        options={[{ value: "recent", label: "Most Recent" }, { value: "top", label: "Top Rated" }]}
+        onChange={() => {}}
+      />
+      <ListingToolbar.ViewToggle value="standard" onChange={() => {}} />
+    </ListingPageHeader>
+  ),
+};
