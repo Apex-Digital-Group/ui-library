@@ -32,6 +32,10 @@ function fireToast(variant, content, opts = {}) {
     position: o.position, // react-toastify positions share our naming (top-right, …)
     background: o.background,
     scheme: o.scheme,
+    anchor: o.anchor, // inline feedback: Element | false | undefined (auto)
+    loading: o.loading,
+    actionLabel: o.actionLabel,
+    onAction: o.onAction,
   });
 }
 
@@ -45,7 +49,7 @@ export const toast = Object.assign(
     warning: (content, opts) => fireToast("warning", content, opts),
     dark: (content, opts) => fireToast("info", content, opts),
     default: (content, opts) => fireToast("info", content, opts),
-    loading: (content, opts) => fireToast("info", content, { ...opts, autoClose: false }),
+    loading: (content, opts) => fireToast("info", content, { ...opts, autoClose: false, loading: true }),
     dismiss: (id) => (id == null ? alertStore.dismissAll() : alertStore.dismiss(id)),
     clearWaitingQueue: () => {},
     isActive: (id) => alertStore.getToasts().some((t) => t.id === id),
@@ -82,6 +86,10 @@ function fireMessage(variant, content, duration, onClose) {
     variant: isLoading ? "info" : variant,
     title: asText(cfg.content),
     duration: isLoading ? 0 : secs * 1000,
+    loading: isLoading,
+    anchor: cfg.anchor,
+    actionLabel: cfg.actionLabel,
+    onAction: cfg.onAction,
   });
   if (typeof onClose === "function" && secs > 0) setTimeout(onClose, secs * 1000);
   const close = () => alertStore.dismiss(id);
@@ -113,6 +121,7 @@ function fireNotification(variant, cfg = {}) {
     title: asText(cfg.message),
     message: asText(cfg.description),
     duration: secs === 0 || secs === null ? 0 : secs * 1000,
+    anchor: cfg.anchor,
   });
 }
 
