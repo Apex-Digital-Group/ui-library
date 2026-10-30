@@ -19,6 +19,14 @@ import {
   closedByUser,
   isWriteRequest,
   compactText,
+  replacementAt,
+  removedItem,
+  listShrank,
+  itemBack,
+  controlIn,
+  trailOf,
+  placeholderFor,
+  buttonGroupOf,
   setTrackedOrigins,
   attributedTap,
   snackbarDuration,
@@ -558,5 +566,226 @@ describe("inline messages beside tiny controls", () => {
     expect(p.left + 120).toBeLessThanOrEqual(632); // ends at the button's right edge, inside the card
     const wide = computePlacement(r, 300, 20, null, 1280, 820, "center", box);
     expect(wide.left + 300).toBeLessThanOrEqual(640 - 8); // never past the card's right edge
+  });
+});
+
+describe("a removed card keeps its place", () => {
+  const box = (el, r) => { el.getBoundingClientRect = () => ({ ...r, right: r.left + r.width, bottom: r.top + r.height, x: r.left, y: r.top }); };
+  let grid;
+  let cards;
+  // jsdom has no layout: the inserted copy measures where the removed item was
+  const realRect = Element.prototype.getBoundingClientRect;
+  afterEach(() => { Element.prototype.getBoundingClientRect = realRect; });
+  const copyLandsAt = (r) => {
+    Element.prototype.getBoundingClientRect = function rect() {
+      if (this.getAttribute && this.getAttribute("data-lg-feedback") === "ghost") return { ...r, right: r.left + r.width, bottom: r.top + r.height };
+      return realRect.call(this);
+    };
+  };
+  beforeEach(() => {
+    document.body.innerHTML = "";
+    grid = document.createElement("div");
+    cards = [0, 1, 2].map((i) => {
+      const c = document.createElement("article");
+      c.innerHTML = `<p>post ${["alpha", "beta", "gamma"][i]}</p><button aria-label="Remove from favourites"></button>`;
+      grid.appendChild(c);
+      box(c, { top: 100, left: 20 + i * 420, width: 400, height: 120 });
+      box(c.querySelector("button"), { top: 110, left: 380 + i * 420, width: 36, height: 36 });
+      return c;
+    });
+    document.body.appendChild(grid);
+  });
+
+  it("finds the removed card and the list it sat in", () => {
+    const trail = trailOf(cards[0].querySelector("button"));
+    expect(removedItem(trail)).toBe(null); // still on the page
+    grid.removeChild(cards[0]);
+    const item = removedItem(trail);
+    expect(item.el).toBe(cards[0]);
+    expect(item.parent).toBe(grid);
+    expect(item.next).toBe(cards[1]);
+  });
+
+  it("the next card sliding into the spot is not the removed control", () => {
+    const btn = cards[0].querySelector("button");
+    const trail = trailOf(btn);
+    grid.removeChild(cards[0]);
+    const slid = cards[1].querySelector("button");
+    box(slid, { top: 110, left: 380, width: 36, height: 36 });
+    document.elementFromPoint = () => slid;
+    expect(replacementAt({ top: 110, left: 380, width: 36, height: 36 }, trail)).toBe(null);
+    // a NEW row in the removed one's place (list refreshed) is the same item re-rendered
+    const fresh = document.createElement("article");
+    fresh.innerHTML = '<p>post alpha</p><button aria-label="Deliver clip"></button>';
+    grid.insertBefore(fresh, cards[1]);
+    const freshBtn = fresh.querySelector("button");
+    box(freshBtn, { top: 110, left: 380, width: 36, height: 36 });
+    document.elementFromPoint = () => freshBtn;
+    expect(replacementAt({ top: 110, left: 380, width: 36, height: 36 }, trail)).toBe(freshBtn);
+    delete document.elementFromPoint;
+  });
+
+  it("a list that redraws EVERY row after a removal: the row now in the spot is another item", () => {
+    const btn = cards[0].querySelector("button");
+    const trail = trailOf(btn);
+    // rows keyed by position: React drops all three and draws two new ones
+    grid.replaceChildren(...[1, 2].map((i) => {
+      const c = document.createElement("article");
+      c.innerHTML = `<p>post ${i}</p><button aria-label="Remove from favourites"></button>`;
+      return c;
+    }));
+    const item = removedItem(trail);
+    expect(listShrank(item)).toBe(true);
+    const now = grid.firstElementChild.querySelector("button");
+    box(now, { top: 110, left: 380, width: 36, height: 36 });
+    document.elementFromPoint = () => now;
+    expect(replacementAt({ top: 110, left: 380, width: 36, height: 36 }, trail)).toBe(null);
+    delete document.elementFromPoint;
+    // the copy goes back at the removed row's old position
+    copyLandsAt(item.rect);
+    const ph = placeholderFor(item);
+    expect(grid.firstElementChild).toBe(ph);
+  });
+
+  it("a form drawn again as its row (same number of items) is not a removal", () => {
+    const trail = trailOf(cards[1].querySelector("button"));
+    const row = document.createElement("article");
+    row.textContent = "Saved row";
+    grid.replaceChild(row, cards[1]);
+    expect(listShrank(removedItem(trail))).toBe(false);
+  });
+
+  it("puts a dimmed, inert copy of the card where the card was", () => {
+    const trail = trailOf(cards[1].querySelector("button"));
+    grid.removeChild(cards[1]);
+    copyLandsAt(removedItem(trail).rect);
+    const ph = placeholderFor(removedItem(trail));
+    expect(ph).not.toBe(cards[1]);
+    expect(ph.tagName).toBe("ARTICLE");
+    expect(ph.textContent).toContain("post beta");
+    expect(ph.parentNode).toBe(grid);
+    expect(ph.nextSibling).toBe(cards[2]);
+    expect(ph.getAttribute("data-lg-feedback")).toBe("ghost");
+    expect(ph.hasAttribute("inert")).toBe(true);
+    expect(ph.style.pointerEvents).toBe("none");
+    expect(ph.style.minHeight).toBe("120px");
+  });
+
+  it("no copy when it would land somewhere else (the list was swapped for a loader)", () => {
+    const trail = trailOf(cards[1].querySelector("button"));
+    grid.removeChild(cards[1]);
+    copyLandsAt({ top: 905, left: 20, width: 400, height: 120 });
+    expect(placeholderFor(removedItem(trail))).toBe(null);
+    expect(grid.querySelector('[data-lg-feedback="ghost"]')).toBe(null);
+  });
+
+  it("no copy of a one-off block (a page section, a form) — only of a list item", () => {
+    document.body.innerHTML = '<main><header>Requests</header><section class="sec-padding"><button>Approve</button></section><footer>f</footer></main>';
+    const sec = document.querySelector("section");
+    box(sec, { top: 100, left: 0, width: 600, height: 300 });
+    const trail = trailOf(sec.querySelector("button"));
+    sec.remove();
+    copyLandsAt({ top: 100, left: 0, width: 600, height: 300 });
+    expect(placeholderFor(removedItem(trail))).toBe(null);
+  });
+
+  it("a different order now in the spot is not the removed order drawn again", () => {
+    document.body.innerHTML = '<ul id="orders"><li class="order">Birthday clip 25 credits <button>Accept</button></li><li class="order">Shoutout 10 credits <button>Accept</button></li></ul>';
+    const list = document.getElementById("orders");
+    const first = list.firstElementChild;
+    const trail = trailOf(first.querySelector("button"));
+    // refreshed list, keyed by position, still two rows: a new order joined the bottom
+    list.innerHTML = '<li class="order">Shoutout 10 credits <button>Accept</button></li><li class="order">Dance 12 credits <button>Accept</button></li>';
+    const now = list.firstElementChild.querySelector("button");
+    box(now, { top: 10, left: 300, width: 80, height: 32 });
+    document.elementFromPoint = () => now;
+    expect(replacementAt({ top: 10, left: 300, width: 80, height: 32 }, trail)).toBe(null);
+    // the same order drawn again with its next step is a replacement
+    list.innerHTML = '<li class="order">Birthday clip 25 credits <button>Deliver clip</button></li><li class="order">Shoutout 10 credits <button>Accept</button></li>';
+    const again = list.firstElementChild.querySelector("button");
+    box(again, { top: 10, left: 300, width: 80, height: 32 });
+    document.elementFromPoint = () => again;
+    expect(replacementAt({ top: 10, left: 300, width: 80, height: 32 }, trail)).toBe(again);
+    delete document.elementFromPoint;
+  });
+
+  it("knows WHICH removed card came back: Undo on the first never ends the second's message", () => {
+    const t0 = trailOf(cards[0].querySelector("button"));
+    const t1 = trailOf(cards[1].querySelector("button"));
+    grid.removeChild(cards[0]);
+    grid.removeChild(cards[1]);
+    const first = removedItem(t0);
+    const second = removedItem(t1);
+    // Undo on the first: React draws that card again (a new element), here at the end
+    const again = document.createElement("article");
+    again.innerHTML = '<p>post alpha</p><button aria-label="Remove from favourites"></button>';
+    grid.appendChild(again);
+    expect(itemBack(first)).toBe(again);
+    expect(itemBack(second)).toBe(null);
+    // an error about the first goes to ITS heart, wherever the card now sits
+    expect(controlIn(again, t0, first)).toBe(again.querySelector("button"));
+  });
+
+  it("a table row keeps its place as a row", () => {
+    document.body.innerHTML = "<table><tbody><tr id=r1><td>a</td><td><button>Approve</button></td></tr><tr><td>b</td><td>c</td></tr></tbody></table>";
+    const row = document.querySelector("tr");
+    box(row, { top: 50, left: 0, width: 600, height: 48 });
+    const trail = trailOf(row.querySelector("button"));
+    const tbody = row.parentNode;
+    tbody.removeChild(row);
+    copyLandsAt(removedItem(trail).rect);
+    const ph = placeholderFor(removedItem(trail));
+    expect(ph.tagName).toBe("TR");
+    expect(ph.cells.length).toBe(2);
+    expect(ph.id).toBe(""); // no duplicate ids
+    expect(tbody.firstChild).toBe(ph);
+  });
+});
+
+describe("buttons in a panel that opens out of the header nav", () => {
+  it("Mark all read in the bell sheet (full width on a phone) is an action", () => {
+    document.body.innerHTML = '<nav><ul><li><div id="sheet" style="position:fixed;top:60px;left:0;right:0"><button id="mark">Mark all read</button></div></li></ul></nav>';
+    document.getElementById("sheet").getBoundingClientRect = () => ({ top: 60, left: 0, width: 390, height: 500, right: 390, bottom: 560 });
+    expect(pickAnchor(document.getElementById("mark"))).toBe(document.getElementById("mark"));
+  });
+  it("a plain header button stays navigation", () => {
+    document.body.innerHTML = '<nav><button id="menu">Menu</button></nav>';
+    expect(pickAnchor(document.getElementById("menu"))).toBe(null);
+  });
+});
+
+describe("buttons inside a card that is a link", () => {
+  it("Follow on a creator card link is an action of its own", () => {
+    document.body.innerHTML = '<a href="/profile/ava" id="card"><img alt=""><span>Ava Ross</span><span>12 videos</span><button id="f">Follow</button></a>';
+    expect(pickAnchor(document.getElementById("f"))).toBe(document.getElementById("f"));
+  });
+});
+
+describe("buttonGroupOf", () => {
+  const box = (el, r) => { el.getBoundingClientRect = () => ({ ...r, right: r.left + r.width, bottom: r.top + r.height }); };
+  it("a cart icon fused with its price into one drawn pill → the pill", () => {
+    document.body.innerHTML = '<span id="pill" style="display:flex;border:1px solid pink"><button id="p"><b>0.00</b> cr</button><button id="c" aria-label="Add to basket"><svg></svg></button></span>';
+    const pill = document.getElementById("pill");
+    box(pill, { top: 0, left: 0, width: 110, height: 28 });
+    box(document.getElementById("p"), { top: 0, left: 0, width: 80, height: 26 });
+    box(document.getElementById("c"), { top: 0, left: 80, width: 28, height: 26 });
+    expect(buttonGroupOf(document.getElementById("c"))).toBe(pill);
+  });
+  it("a plain row of icons (like, comment, share) is not a pill", () => {
+    document.body.innerHTML = '<div id="row" style="display:flex"><button id="a"><svg></svg></button><button id="b"><svg></svg></button></div>';
+    const row = document.getElementById("row");
+    box(row, { top: 0, left: 0, width: 110, height: 28 });
+    for (const id of ["a", "b"]) box(document.getElementById(id), { top: 0, left: 0, width: 28, height: 26 });
+    expect(buttonGroupOf(document.getElementById("a"))).toBe(null);
+  });
+});
+
+describe("short errors beside tiny controls", () => {
+  it("says what is wrong in a few words", () => {
+    expect(errorLabelCandidates("This item is not available for purchase.")).toEqual([
+      "This item is not available for purchase", "Not available for purchase", "Not available", "Failed",
+    ]);
+    expect(compactText("This item is not available for purchase.", "error")).toBe("Not available");
+    expect(compactText("Something went wrong while processing your request", "error")).toBe("Something went wrong while processing your request");
   });
 });

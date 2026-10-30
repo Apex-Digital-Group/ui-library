@@ -183,11 +183,27 @@ export function pickAnchor(target) {
   const el = target.closest(ANCHOR_SELECTOR);
   if (!el) return null;
   const ex = el.closest(EXCLUDE_SELECTOR);
-  // a header <nav> is navigation — but a button inside a dropdown panel opened
-  // from it ("Mark all read" in the bell panel) is an action
-  if (ex && !(ex.matches("nav") && !el.closest("a[href]") && !el.closest(EXCLUDE_SELECTOR.replace(/(^|,)nav(,|$)/, "$1:not(*)$2")) && floatingMenuOf(el))) return null;
-  return el;
+  if (!ex) return el;
+  // a header <nav> is navigation — but a button inside a panel or sheet opened
+  // from it ("Mark all read" in the bell panel, full-screen on a phone) is an action
+  if (ex.matches("nav") && !el.closest(EXCLUDE_BUT_NAV) && (floatingMenuOf(el) || dialogOf(el) || panelIn(el, ex))) return el;
+  // a real button inside a card that is a link (Follow on a creator card) is an
+  // action of its own, not the link
+  if (ex.matches("a[href]") && ex !== el && el.matches("button,[role=button],.ant-btn") && !el.closest(EXCLUDE_BUT_LINK)
+    && visibleText(ex).length > visibleText(el).length + 2) return el; // (a link that is just this button stays a link)
+  return null;
 }
+const EXCLUDE_BUT_NAV = EXCLUDE_SELECTOR.split(",").filter((x) => x !== "nav").join(",");
+/** A panel that floats out of the header (the bell list; a full-width sheet on a phone). */
+function panelIn(el, nav) {
+  for (let n = el.parentElement; n && n !== nav; n = n.parentElement) {
+    let cs;
+    try { cs = getComputedStyle(n); } catch { return false; }
+    if ((cs.position === "fixed" || cs.position === "absolute") && n.getBoundingClientRect().height >= 60) return true;
+  }
+  return false;
+}
+const EXCLUDE_BUT_LINK = EXCLUDE_SELECTOR.split(",").filter((x) => x !== "a[href]").join(",");
 
 /**
  * A clickable row that is not a button (a search result <div onClick>): the
@@ -260,19 +276,32 @@ function floatingMenuOf(n) {
   return null;
 }
 
+/** Two boxes touch or nearly touch (a menu and the control that opened it). */
+function nextTo(a, b) {
+  const p = a.getBoundingClientRect();
+  const q = b.getBoundingClientRect();
+  const dx = Math.max(0, p.left - q.right, q.left - p.right);
+  const dy = Math.max(0, p.top - q.bottom, q.top - p.bottom);
+  return dx <= 96 && dy <= 96;
+}
+
 function record(target, el, hint) {
   const ref = el || (target && target.nodeType === 1 ? target : target && target.parentElement);
   if (ref && typeof ref.closest === "function" && ref.closest("[data-lg-feedback]")) return; // our own buttons
   // a tap on an item of a menu opened by the previous tap ("…" → Pin post,
   // Share → Copy link): its result shows on that opener
   let opener = null;
-  const menu = floatingMenuOf(ref);
+  // (a tap on a menu's own trigger — "⋮" inside a card's floating corner — is not an item of it)
+  const trigger = ref && typeof ref.closest === "function" && ref.closest(".ant-dropdown-trigger,[aria-haspopup],[aria-expanded]");
+  const menu = trigger ? null : floatingMenuOf(ref);
   if (menu && last && now() - last.t < 60000) {
     // the opener: the last tapped control, even one that is not an anchor
     // itself (antd marks a menu's trigger .ant-dropdown-trigger)
     const prevCtl = last.el || (last.target && typeof last.target.closest === "function"
       ? last.target.closest('button,[role=button],.ant-btn,[aria-haspopup],a') : null);
-    if (prevCtl && prevCtl.isConnected && !menu.contains(prevCtl) && !prevCtl.closest("[data-lg-feedback]")) {
+    // a menu opens right next to the control that opened it (a Like further down
+    // the same card did not open the card's "⋮" menu)
+    if (prevCtl && prevCtl.isConnected && !menu.contains(prevCtl) && !prevCtl.closest("[data-lg-feedback]") && nextTo(prevCtl, menu)) {
       opener = prevCtl;
       if (!el) el = opener; // the item itself is not an anchor (antd menu items): use the opener
     }
@@ -291,8 +320,8 @@ function record(target, el, hint) {
       if (tapHistory.length > 30) tapHistory.shift();
     }
   } catch { /* ignore */ }
-  last = { el: el || null, hint, t: now(), rect, label: el ? visibleText(el) : "", href: window.location.href, target: ref || null };
-  if (opener && opener !== el) last.opener = opener;
+  last = { el: el || null, hint, t: now(), rect, label: el ? visibleText(el) : "", href: window.location.href, target: ref || null, trail: el ? trailOf(el) : null };
+  if (opener && opener !== el) { last.opener = opener; last.openerTrail = trailOf(opener); }
   // a close / cancel tap never holds its dialog, whatever requests it sets off
   // (closing the upload wizard pauses the upload: those requests are this tap's)
   if (el && isCloseLike(el)) last.dismiss = true;
@@ -340,6 +369,8 @@ const CLOSE_WORDS = new RegExp("^(?:" + [
   // a close that saves nothing is never held anyway)
   "maybe later", "got it", "understood", "×", "✕", "x",
   "decline", "reject", "ignore", "deny", // an incoming call / request: declining just closes it
+  // a cookie / consent prompt: any choice just puts it away (nothing to show on it)
+  "accept all", "accept all cookies", "allow all", "reject all", "decline all", "deny all", "necessary only", "only necessary",
   "abbrechen", "schließen", "zurück", "nein", // de
   "annuler", "fermer", "retour", "non", // fr
   "cancelar", "cerrar", "volver", "atrás", // es
@@ -359,7 +390,22 @@ function isCloseLike(el) {
   const aria = (el.getAttribute("aria-label") || el.getAttribute("title") || "").trim();
   if (/^(?:close|dismiss|cancel)\b/i.test(aria)) return true;
   const label = visibleText(el).replace(/[.!…]+$/, "").replace(/^(?:yes|ok|okay)[,\s]+/i, "");
+  // "Decline the extension?" [Cancel] [Decline]: Cancel closes, Decline is the answer
+  if (REFUSE_WORDS.test(label) && hasOwnCancel(el)) return false;
   return CLOSE_WORDS.test(label) || DISMISS_LEAD.test(label) || DISMISS_WORK.test(label);
+}
+
+const REFUSE_WORDS = /^(?:decline|reject|ignore|deny|ablehnen|refuser|rechazar|recusar)$/i;
+/** The control's dialog has a separate way to just close it (X, Cancel, No…). */
+function hasOwnCancel(el) {
+  const d = dialogOf(el);
+  if (!d) return false;
+  return Array.from(d.querySelectorAll("button,[role=button]")).some((b) => {
+    if (b === el) return false;
+    const words = visibleText(b).replace(/[.!…]+$/, "");
+    if (REFUSE_WORDS.test(words)) return false;
+    return isCloseLike(b);
+  });
 }
 
 // ---- a dialog the USER closed is never held ----
@@ -777,6 +823,16 @@ export function installInteractionTracker() {
   };
 }
 
+/**
+ * A tap on a message's own action (Undo) counts as a new tap on the control
+ * that message stood for, so what the action sets off (a restore that fails)
+ * reports in the same place.
+ */
+export function retap(prev) {
+  if (!prev) return;
+  last = { el: prev.el, hint: prev.hint, t: now(), rect: prev.rect, label: prev.label, href: hasDom() ? window.location.href : "", target: prev.target, trail: prev.trail, opener: prev.opener, openerTrail: prev.openerTrail };
+}
+
 /** The last tap if it is recent enough to own the next message (weak link). */
 export function recentInteraction() {
   if (!last || !last.el || last.clickable) return null; // a row tap never owns a message by time alone
@@ -992,6 +1048,12 @@ export function errorLabelCandidates(text, failed = "Failed") {
   const full = shortLabel(text);
   const first = full.split(/[.!?]\s+|\s+[·—–]\s+|\s+-\s+|,\s+|\s+\(/)[0].replace(/[.!]+$/, "").trim();
   const out = [first];
+  // "This item is not available for purchase" → "Not available for purchase" → "Not available"
+  const neg = first.match(/^(?:this|that|the|your|it)\b[^,]*?\s(?:(?:is|are|was|were)\s+not|isn't|aren't|wasn't)\s+(.+)$/i);
+  if (neg) {
+    const what = `Not ${neg[1]}`;
+    out.push(what, what.split(/\s+(?:for|to|in|on|at|with|from|because|yet|anymore|right now)\b/i)[0]);
+  }
   const m = first.match(/^(couldn't|can't|cannot)\s+(\w+)/i);
   // "Couldn't do that" → "Couldn't do" says nothing: go straight to the common word
   if (m && !/^(?:do|complete|process|perform|finish|handle|proceed|continue|that|this|it)$/i.test(m[2])) out.push(`${m[1]} ${m[2]}`);
@@ -1053,14 +1115,266 @@ export function containerBox(el) {
     try { cs = getComputedStyle(n); } catch { return null; }
     const r = n.getBoundingClientRect();
     if (r.width < 160 || r.height < 48) continue;
-    const m = /rgba?\(([^)]+)\)/.exec(cs.backgroundColor || "");
-    const parts = m ? m[1].split(/[\s,/]+/).filter(Boolean) : [];
-    const alpha = parts.length > 3 ? parseFloat(parts[3]) : (m ? 1 : 0);
-    const boxed = alpha > 0.04 || (cs.backgroundImage && cs.backgroundImage !== "none")
-      || parseFloat(cs.borderTopWidth) > 0 || parseFloat(cs.borderLeftWidth) > 0 || (cs.boxShadow && cs.boxShadow !== "none");
-    if (boxed) return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+    if (isDrawnBox(cs)) return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
   }
   return null;
+}
+
+/**
+ * No words of the page under this rect (pictures and plain backgrounds are
+ * fine): a message can sit there without covering anything readable.
+ */
+export function freeOfText(rect) {
+  if (!hasDom() || typeof document.elementFromPoint !== "function") return false;
+  const right = rect.left + rect.width;
+  const bottom = rect.top + rect.height;
+  // the words themselves (a title line is as wide as its card, its words are not)
+  const covers = (node) => {
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    return Array.from(range.getClientRects()).some((q) => q.left < right + 2 && q.right > rect.left - 2 && q.top < bottom + 2 && q.bottom > rect.top - 2);
+  };
+  for (const fx of [0.05, 0.5, 0.95]) {
+    for (const fy of [0.2, 0.8]) {
+      const x = rect.left + rect.width * fx;
+      const y = rect.top + rect.height * fy;
+      if (x < 0 || y < 0 || x >= window.innerWidth || y >= window.innerHeight) return false;
+      const hit = document.elementFromPoint(x, y);
+      if (!hit) continue;
+      // a control under it (a whole clickable card is not one)
+      const ctl = hit.closest && hit.closest(ANCHOR_SELECTOR);
+      if (ctl) {
+        const q = ctl.getBoundingClientRect();
+        if (q.width * q.height < 160 * 120) return false;
+      }
+      if (Array.from(hit.childNodes).some((n) => n.nodeType === 3 && n.textContent.trim() && covers(n))) return false;
+    }
+  }
+  return true;
+}
+
+/** A picture (photo, video, cover image) is under this rect: plain coloured text would not read on it. */
+export function overPicture(rect) {
+  if (!hasDom() || typeof document.elementFromPoint !== "function") return false;
+  for (const fx of [0.15, 0.5, 0.85]) {
+    const x = rect.left + rect.width * fx;
+    const y = rect.top + rect.height / 2;
+    if (x < 0 || y < 0 || x >= window.innerWidth || y >= window.innerHeight) continue;
+    for (let n = document.elementFromPoint(x, y), i = 0; n && i < 3 && n !== document.body; n = n.parentElement, i += 1) {
+      if (/^(?:IMG|VIDEO|CANVAS|PICTURE)$/.test(n.tagName)) return true;
+      let bg = "";
+      try { bg = getComputedStyle(n).backgroundImage; } catch { /* ignore */ }
+      if (/url\(/.test(bg || "")) return true;
+    }
+  }
+  return false;
+}
+
+/** Drawn as a box of its own: a background, a border or a shadow. */
+function isDrawnBox(cs) {
+  const m = /rgba?\(([^)]+)\)/.exec(cs.backgroundColor || "");
+  const parts = m ? m[1].split(/[\s,/]+/).filter(Boolean) : [];
+  const alpha = parts.length > 3 ? parseFloat(parts[3]) : (m ? 1 : 0);
+  return alpha > 0.04 || (!!cs.backgroundImage && cs.backgroundImage !== "none")
+    || parseFloat(cs.borderTopWidth) > 0 || parseFloat(cs.borderLeftWidth) > 0 || (!!cs.boxShadow && cs.boxShadow !== "none");
+}
+
+/**
+ * A tiny icon button fused with its neighbours into one drawn pill
+ * ("12.00 CR | cart"): the pill, so a result can show inside it instead of a
+ * line of text spilling off the card. A plain row of icons is not a pill.
+ */
+export function buttonGroupOf(el) {
+  if (!hasDom() || !el || !isIconOnly(el) || el.matches(SWITCH_SELECTOR)) return null;
+  const p = el.parentElement;
+  if (!p || p === document.body || p.id === "root") return null;
+  const kids = Array.from(p.children).filter((k) => {
+    const r = k.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
+  });
+  if (kids.length < 2 || kids.length > 3 || !kids.every((k) => k.matches("button,[role=button],a[href]"))) return null;
+  const r = p.getBoundingClientRect();
+  if (r.height < 18 || r.height > 64 || r.width < 64 || r.width > 360) return null;
+  // fused: the buttons fill the pill edge to edge
+  const filled = kids.reduce((w, k) => w + k.getBoundingClientRect().width, 0);
+  if (filled < r.width * 0.85) return null;
+  let cs;
+  try { cs = getComputedStyle(p); } catch { return null; }
+  return isDrawnBox(cs) ? p : null;
+}
+
+/**
+ * The tapped control and its ancestors at tap time — where each sat, among
+ * which siblings — so a card removed by the tap can keep its place.
+ */
+export function trailOf(el) {
+  if (!hasDom() || !el) return null;
+  const out = [];
+  for (let n = el, i = 0; n && n.parentElement && i < 12; n = n.parentElement, i += 1) {
+    const p = n.parentElement;
+    if (p === document.body || p === document.documentElement) break;
+    const r = n.getBoundingClientRect();
+    let cs = null;
+    try { cs = getComputedStyle(n); } catch { /* detached */ }
+    out.push({
+      el: n,
+      parent: p,
+      next: n.nextSibling,
+      kids: Array.from(p.children),
+      rect: { top: r.top, left: r.left, width: r.width, height: r.height },
+      radius: cs ? cs.borderRadius : "",
+      margin: cs ? cs.margin : "",
+      cells: n.tagName === "TR" ? n.cells.length : 0,
+    });
+  }
+  return out;
+}
+
+/**
+ * The piece of the page the tap took away with its control (the removed card,
+ * row or the control alone): the highest gone ancestor whose list is still
+ * there. Null when the control is still in the page.
+ */
+export function removedItem(trail) {
+  if (!trail || !trail.length) return null;
+  for (const s of trail) {
+    if (s.el.isConnected) return null;
+    if (s.parent.isConnected) return s;
+  }
+  return null;
+}
+
+const notOurs = (n) => !(n.matches && n.matches("[data-lg-feedback]"));
+
+/**
+ * The list the item sat in holds fewer items now: it was taken OUT (a removed
+ * favourite, an unbanned user), not drawn again in place (a form that became
+ * its row, "Accept" that became "Deliver clip").
+ */
+export function listShrank(item) {
+  if (!item || !item.parent || !item.kids) return false;
+  return Array.from(item.parent.children).filter(notOurs).length < item.kids.filter(notOurs).length;
+}
+
+/**
+ * The removed item is back in its list (Undo, or the app putting it back after
+ * a failed remove): the new element that is that same item — matched by the
+ * words only it had, wherever it now sits — else null.
+ */
+export function itemBack(item) {
+  if (!item || !item.parent || !item.parent.isConnected || !repeatedItem(item)) return null;
+  for (const c of Array.from(item.parent.children)) {
+    if (!notOurs(c) || item.kids.includes(c)) continue;
+    if (c.tagName === item.el.tagName && sameItemText(item, c, true)) return c;
+  }
+  return null;
+}
+
+/** In the item that came back, the control at the same place the tapped one had. */
+export function controlIn(back, trail, item) {
+  if (!back || !trail) return null;
+  const path = [];
+  for (const s of trail) {
+    if (s.el === item.el) break;
+    path.unshift(Array.prototype.indexOf.call(s.kids, s.el));
+  }
+  let n = back;
+  for (const i of path) n = n && n.children[i];
+  return n && typeof n.matches === "function" && n.matches(ANCHOR_SELECTOR) ? n : null;
+}
+
+/**
+ * Keeps a removed item in view while its message (Removed · Undo) is on
+ * screen: a dimmed, inert copy of the card at the place it was, so the user
+ * sees WHAT was removed and the next card does not slide under the message.
+ * Undo puts the real card back into the same place; the caller removes the
+ * copy when the message ends.
+ */
+export function placeholderFor(item) {
+  if (!hasDom() || !item || !item.el || item.el.nodeType !== 1) return null;
+  const p = item.parent;
+  const g = item.rect;
+  if (!p || !p.isConnected || p === document.body || p.id === "root") return null;
+  if (!g || !(g.width > 0) || !(g.height > 0) || g.height > window.innerHeight * 0.9 || g.width > window.innerWidth) return null;
+  // one of a list of like items (cards, rows, tiles) — not a page section or a form
+  if (!repeatedItem(item)) return null;
+  const ph = item.el.cloneNode(true);
+  // a still picture: no duplicate ids, no playing / reloading media
+  ph.removeAttribute("id");
+  for (const n of ph.querySelectorAll("[id]")) n.removeAttribute("id");
+  for (const v of ph.querySelectorAll("video")) {
+    v.removeAttribute("autoplay");
+    v.autoplay = false;
+    v.preload = "none";
+    v.muted = true;
+  }
+  for (const f of ph.querySelectorAll("iframe")) {
+    const d = document.createElement("div");
+    d.className = f.className;
+    d.style.cssText = f.style.cssText;
+    f.replaceWith(d);
+  }
+  const from = item.el.querySelectorAll("canvas");
+  ph.querySelectorAll("canvas").forEach((c, i) => {
+    try {
+      c.width = from[i].width;
+      c.height = from[i].height;
+      c.getContext("2d").drawImage(from[i], 0, 0);
+    } catch { /* tainted or no 2d context: leave it blank */ }
+  });
+  ph.setAttribute("data-lg-feedback", "ghost");
+  ph.setAttribute("aria-hidden", "true");
+  ph.setAttribute("inert", "");
+  ph.style.pointerEvents = "none";
+  ph.style.animation = "none"; // an entrance animation would replay on the copy
+  ph.style.opacity = ".32";
+  ph.style.filter = "saturate(.45)";
+  ph.style.transition = "opacity .2s ease";
+  if (ph.tagName !== "TR") ph.style.minHeight = `${g.height}px`;
+  // where it was: before its old neighbour, or (a list that redrew every row)
+  // before whatever now sits at its old position
+  const idx = item.kids.filter(notOurs).indexOf(item.el);
+  const ref = item.next && item.next.parentNode === p ? item.next
+    : (idx >= 0 ? Array.from(p.children).filter(notOurs)[idx] || null : null);
+  p.insertBefore(ph, ref);
+  // it must show where the item was (a list swapped for a loader puts it elsewhere)
+  const at = ph.getBoundingClientRect();
+  if (Math.abs(at.top - g.top) > Math.max(48, g.height / 2) || Math.abs(at.left - g.left) > Math.max(48, g.width / 2)) {
+    ph.remove();
+    return null;
+  }
+  return ph;
+}
+
+const classesOf = (n) => (typeof n.className === "string" ? n.className.split(/\s+/).filter(Boolean) : []);
+/** The removed element had a sibling of its own kind (same tag, a shared class) at the tap. */
+function repeatedItem(item) {
+  const mine = classesOf(item.el);
+  return item.kids.some((k) => {
+    if (k === item.el || k.tagName !== item.el.tagName || !notOurs(k)) return false;
+    const theirs = classesOf(k);
+    return mine.length === 0 ? theirs.length === 0 : theirs.some((c) => mine.includes(c));
+  });
+}
+
+const wordsOf = (s) => new Set(String(s || "").toLowerCase().split(/[^\p{L}\p{N}@#]+/u).filter((w) => w.length > 1));
+/**
+ * The new row in the removed row's place is that same item drawn again: it
+ * keeps the words only the removed row had (its title, name, amount), not just
+ * the words every row has ("Accept", "credits").
+ */
+function ownWords(item) {
+  const own = wordsOf(item.el.textContent);
+  for (const k of item.kids) if (k !== item.el) for (const w of wordsOf(k.textContent)) own.delete(w);
+  return own;
+}
+function sameItemText(item, row, strict = false) {
+  const own = ownWords(item);
+  if (!own.size) return !strict; // nothing tells the rows apart
+  const now = wordsOf(row.textContent);
+  let kept = 0;
+  for (const w of own) if (now.has(w)) kept += 1;
+  return kept / own.size >= 0.5;
 }
 
 /**
@@ -1073,8 +1387,10 @@ export function compactText(text, variant) {
     const c = labelCandidates(text);
     return c.find((x) => x.length <= 18) || c.reduce((a, b) => (b.length < a.length ? b : a), c[0] || String(text));
   }
-  const first = errorLabelCandidates(text, "")[0] || String(text);
-  return first.length <= 40 ? first : String(text);
+  // one short line beside the control; the common "Failed" (always last) says nothing here
+  const c = errorLabelCandidates(text).slice(0, -1);
+  const first = c[0] || String(text);
+  return c.find((x) => x.length <= 24) || (first.length <= 40 ? first : String(text));
 }
 
 // ---------------------------------------------------------------------------
@@ -1329,7 +1645,7 @@ export function watchNewSurface(onNew, since, at) {
     // the layer under the held copy's middle is new and covers a good part of the screen
     if (typeof at === "function") {
       const p = at();
-      const under = p && document.elementFromPoint(p.x, p.y);
+      const under = p && typeof document.elementFromPoint === "function" && document.elementFromPoint(p.x, p.y);
       for (let n = under, i = 0; n && n !== document.body && i < 14; n = n.parentElement, i += 1) {
         if (n.closest("[data-lg-feedback]")) break;
         if (!isFixed(n)) continue;
@@ -1352,14 +1668,29 @@ export function watchNewSurface(onNew, since, at) {
  * the card and swapped "Accept" for "Deliver clip"): a button-like element
  * covering most of the old spot, or null.
  */
-export function replacementAt(rect) {
+export function replacementAt(rect, trail) {
   if (!hasDom() || !rect || !(rect.width > 0) || typeof document.elementFromPoint !== "function") return null;
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
   if (cx < 0 || cy < 0 || cx >= window.innerWidth || cy >= window.innerHeight) return null;
-  const hit = document.elementFromPoint(cx, cy);
+  // (looking through our own layers: a removed card's dimmed copy, a pop)
+  const hits = typeof document.elementsFromPoint === "function" ? document.elementsFromPoint(cx, cy) : [document.elementFromPoint(cx, cy)];
+  const hit = hits.find((h) => h && !(typeof h.closest === "function" && h.closest("[data-lg-feedback]")));
   const el = hit && typeof hit.closest === "function" ? hit.closest(ANCHOR_SELECTOR) : null;
   if (!el || el.closest("[data-lg-feedback]")) return null;
+  // the card was removed and the NEXT card slid into its place: that is
+  // another item, not this control re-rendered (a new row in its place is)
+  const item = removedItem(trail);
+  if (item) {
+    // taken out of its list: what sits there now is ANOTHER item, even when the
+    // list redrew every row (rows keyed by position)
+    if (listShrank(item)) return null;
+    let n = el;
+    while (n && n.parentElement !== item.parent) n = n.parentElement;
+    if (!n || item.kids.includes(n)) return null;
+    // a whole row was drawn again: it must be the same row (not a button relabelled in place)
+    if (item.el !== trail[0].el && !sameItemText(item, n)) return null;
+  }
   const r = el.getBoundingClientRect();
   const ix = Math.max(0, Math.min(r.right, rect.left + rect.width) - Math.max(r.left, rect.left));
   const iy = Math.max(0, Math.min(r.bottom, rect.top + rect.height) - Math.max(r.top, rect.top));

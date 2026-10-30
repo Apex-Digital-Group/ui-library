@@ -17,9 +17,17 @@ import {
   replacementAt,
   originOnPage,
   newSurfaceSince,
-  classifyAnchor,
   containerBox,
   compactText,
+  removedItem,
+  listShrank,
+  itemBack,
+  controlIn,
+  placeholderFor,
+  retap,
+  buttonGroupOf,
+  freeOfText,
+  overPicture,
 } from "./feedbackAnchor";
 
 /**
@@ -57,9 +65,18 @@ export const FEEDBACK_CSS = `
 .lgf-pop[data-tone=light]{text-shadow:none}
 .lgf-pop[data-tone=light][data-variant=success]{color:#0E7A45}.lgf-pop[data-tone=light][data-variant=error]{color:#C42343}.lgf-pop[data-tone=light][data-variant=warning]{color:#A65F00}.lgf-pop[data-tone=light][data-variant=info]{color:#0B7F84}
 .lgf-pop .lgf-act{padding:0 0 0 8px;text-decoration:underline;text-underline-offset:2px}
+.lgf-pop[data-compact]>.lgf-text{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lgf-pop[data-onmedia]{padding:3px 8px;border-radius:8px;background:rgba(14,9,26,.96);box-shadow:0 4px 14px rgba(0,0,0,.35);text-shadow:none;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.lgf-pop[data-onmedia]>svg{margin-top:2px}
+/* over the dimmed copy of a removed card: a small chip, readable on any picture */
+.lgf-pop[data-side=inside]{align-items:center;padding:7px 14px;border-radius:999px;background:rgba(14,9,26,.96);box-shadow:0 6px 20px rgba(0,0,0,.35);text-shadow:none;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.lgf-pop[data-side=inside]>svg{margin-top:0}
+.lgf-pop[data-side=inside][data-narrow]{white-space:nowrap;padding:5px 9px;gap:4px}
+.lgf-pop[data-side=inside][data-narrow]>svg{display:none}
+.lgf-pop[data-tone=light][data-side=inside]{background:rgba(255,255,255,.94);box-shadow:0 6px 20px rgba(20,10,40,.18)}
 /* host apps may colour every <span> (interactive-twin global-theme.css: span{color:#fff}) —
    feedback text always takes its own state colour */
-[data-lg-feedback]:not([data-lg-feedback=held]) span{color:inherit}
+[data-lg-feedback]:not([data-lg-feedback=held]):not([data-lg-feedback=ghost]) span{color:inherit}
 /* In-button state — Live Gemini "Solid green" save button (design export
    export-success-button / .lg-save--solid): mint fill, dark ink, a check in a
    soft circle, a pulse and a sweep of light; failure = red fill + shake. */
@@ -131,6 +148,12 @@ const isErrorish = (v) => v === "error" || v === "warning";
 const textOf = (t) => (t.title != null && t.title !== "" ? t.title : t.message);
 
 let measureCtx;
+/** An error that says something the user can act on (not just "failed" / "try again"). */
+function meaningful(text) {
+  const t = String(text ?? "").trim();
+  return t.length > 0 && !/^(?:something went wrong|failed|error|request failed|network error|no connection|try again|oops)\b/i.test(t);
+}
+
 function measureText(s, font) {
   const jsdom = typeof navigator !== "undefined" && /jsdom/i.test(navigator.userAgent || "");
   if (!measureCtx && !jsdom) {
@@ -227,6 +250,8 @@ export function AnchoredFeedback({ t, theme, zIndex }) {
   viewRef.current = view;
   const holdRef = React.useRef(null); // { clone, release } while a dialog copy is on screen
   const ghostRef = React.useRef(null); // placeholder where a removed control was (actionable messages)
+  const leavingRef = React.useRef(false);
+  const actedRef = React.useRef(false); // the message's action (Undo) was pressed
 
   const text = textOf(t);
   const errorish = isErrorish(t.variant);
@@ -266,6 +291,13 @@ export function AnchoredFeedback({ t, theme, zIndex }) {
     if (t.extHold) { holdRef.current = t.extHold; watchNext(); }
     let lastRect = null;
     let box = null; // the card the control sits in (inline messages stay inside it)
+    // where the tapped control sat at the tap (its card, that card's list)
+    const tr = t.tapRef || {};
+    const trail = [tr.trail, tr.openerTrail].find((x) => x && x[0] && x[0].el === t.anchors[0]) || null;
+    let slotWatch = null; // the removed item coming back (Undo, a failed remove) ends its copy
+    let replaceUntil = 0; // a list still redrawing: look a moment longer for what replaced the control
+    let inside = false; // shown inside the empty slot of a removed card
+    let standIn = false; // a chip where a vanished control was (no copy of its card)
     const st = { phase: "wait", frames: 0, since: performance.now() };
     // the user closed the dialog themselves (X, Cancel, Escape, a tap outside):
     // it goes at once — no picture put back; the message ends with it
@@ -313,7 +345,7 @@ export function AnchoredFeedback({ t, theme, zIndex }) {
       const onEvent = (e) => {
         if (e.type === "pointerdown" || e.type === "touchstart" || e.type === "mousedown") {
           if (!swallowing) {
-            // a non-modal copy (cookie bar): only a tap ON it is swallowed; the page around it works
+            // a non-modal copy (a bar, a popover): only a tap ON it is swallowed; the page around it works
             const p = e.touches && e.touches[0] ? e.touches[0] : e;
             if (!modal && t.held.covers && !t.held.covers(p.clientX, p.clientY)) { release(); close(); return; }
           }
@@ -357,6 +389,29 @@ export function AnchoredFeedback({ t, theme, zIndex }) {
           && !(t.anchors[0] && t.anchors[0].closest && t.anchors[0].closest('[role=dialog],[role=alertdialog],[aria-modal="true"],.ant-modal,.ant-drawer'))
           && !closedByUser(since, performance.now(), href));
       if (!keep || ghostRef.current) return false;
+      // the whole card / row went: its message sits in the card's empty slot,
+      // which keeps its place in the list (the next card does not slide under it)
+      const item = removedItem(trail);
+      const slot = item && item.el !== t.anchors[0] && listShrank(item) ? placeholderFor(item) : null;
+      if (slot) {
+        ghostRef.current = slot;
+        anchor = slot;
+        isTwin = true;
+        inside = true;
+        if (typeof MutationObserver === "function") {
+          slotWatch = new MutationObserver(() => {
+            if (!itemBack(item)) return;
+            slotWatch.disconnect();
+            if (ghostRef.current === slot) { slot.remove(); ghostRef.current = null; }
+            alive = false;
+            close();
+          });
+          slotWatch.observe(item.parent, { childList: true });
+        }
+        if (st.phase === "shown") enter(slot);
+        else { st.phase = "wait"; st.since = performance.now(); }
+        return true;
+      }
       const g = lastRect || t.rect;
       if (!g || !(g.width > 0) || g.top >= window.innerHeight || g.top + g.height <= 0) return false;
       const ghost = document.createElement("div");
@@ -367,71 +422,99 @@ export function AnchoredFeedback({ t, theme, zIndex }) {
       ghostRef.current = ghost;
       anchor = ghost;
       isTwin = true; // geometry-only visibility, like the held copy
-      if (st.phase === "shown") setView((v) => (v ? { ...v, el: ghost } : v));
+      // the result in words on a small dark chip where the control was — it reads
+      // as a note about the tap, never as a button (even if the list moves under it)
+      inside = true;
+      standIn = true; // short words, one line
+      if (st.phase === "shown") enter(ghost);
       else { st.phase = "wait"; st.since = performance.now(); }
       return true;
     };
 
-    const enter = (el) => {
-      let d = displayFor(t.variant, el, el === t.anchors[0] ? t.hint : undefined);
-      // the spot where a removed text button was: keep the button look (green / red state)
-      if (el === ghostRef.current && t.anchors[0] && (t.variant === "success" || t.variant === "error")) {
-        const kind = classifyAnchor(t.anchors[0], t.hint);
-        const g = el.getBoundingClientRect();
-        if (kind !== "icon" && kind !== "switch" && g.height >= 18 && g.height <= 96 && g.width >= 48) d = { mode: "morph", kind };
+    // Width is locked to the button. The most specific phrase that fits
+    // goes beside the ✓ ("both"), or replaces it on a small button
+    // ("swap"); else the ✓ alone ("icon"). Never a generic word.
+    // success: ✓ in a 24px circle + 10px gap + words ("both"); words alone
+    // when the circle does not fit ("swap"); else the ✓ alone ("icon").
+    // failure (design): the words alone on red ("text"); else ✕ alone.
+    const morphLabel = (el) => {
+      const cs = getComputedStyle(el);
+      const r = el.getBoundingClientRect();
+      const weight = Math.max(600, parseInt(cs.fontWeight, 10) || 600);
+      const font = `${weight} ${cs.fontSize} ${cs.fontFamily}`;
+      const roomBoth = r.width - 24 - (24 + 10) - 2; // padding 12×2, circle + gap
+      const roomText = r.width - 16 - 2; // padding 8×2
+      if (t.variant === "error") {
+        for (const cand of errorLabelCandidates(text, theme.failedLabel)) {
+          const w = Math.ceil(measureText(cand, font));
+          if (w <= roomText) return { label: cand, fit: "text", lw: w, cs, weight };
+        }
+      } else {
+        for (const cand of labelCandidates(text)) {
+          const w = Math.ceil(measureText(cand, font));
+          if (w <= roomBoth) return { label: cand, fit: "both", lw: w, cs, weight };
+          if (w <= roomText) return { label: cand, fit: "swap", lw: w, cs, weight };
+        }
       }
+      return { label: "", fit: "icon", lw: 0, cs, weight };
+    };
+
+    const enter = (el) => {
+      // an icon fused into a pill ("12.00 CR | cart"): the result shows inside the
+      // pill when its words fit there, instead of a line of text off the card
+      if ((t.variant === "success" || t.variant === "error") && el === t.anchors[0] && !forcePop && !inside) {
+        const g = buttonGroupOf(el);
+        const m = g ? morphLabel(g) : null;
+        if (m && m.fit !== "icon" && m.label !== (theme.failedLabel || "Failed")) { anchor = g; el = g; }
+      }
+      let d = displayFor(t.variant, el, el === t.anchors[0] ? t.hint : undefined);
+      if (inside) d = { mode: "pop", kind: "generic" };
+      // the reason does not fit the button and "Failed" would hide it ("Follow this
+      // creator to start a conversation"): say it in a line next to the button instead
+      let reasonLine = false;
+      if (d.mode === "morph" && errorish && meaningful(text) && morphLabel(el).label === (theme.failedLabel || "Failed")) {
+        d = { mode: "pop", kind: d.kind };
+        reasonLine = true;
+      }
+      // a small removed tile (a thumbnail): its short words, on one line, inside it
+      const narrow = inside && (standIn || el.getBoundingClientRect().width < 260);
       if (forcePop) d = { mode: d.kind === "switch" ? "side" : "pop", kind: d.kind };
       let extra = {};
       if (d.mode === "morph") {
-        const cs = getComputedStyle(el);
-        const r = el.getBoundingClientRect();
-        const weight = Math.max(600, parseInt(cs.fontWeight, 10) || 600);
-        const font = `${weight} ${cs.fontSize} ${cs.fontFamily}`;
-        // Width is locked to the button. The most specific phrase that fits
-        // goes beside the ✓ ("both"), or replaces it on a small button
-        // ("swap"); else the ✓ alone ("icon"). Never a generic word.
-        // success: ✓ in a 24px circle + 10px gap + words ("both"); words alone
-        // when the circle does not fit ("swap"); else the ✓ alone ("icon").
-        // failure (design): the words alone on red ("text"); else ✕ alone.
-        const roomBoth = r.width - 24 - (24 + 10) - 2; // padding 12×2, circle + gap
-        const roomText = r.width - 16 - 2; // padding 8×2
-        let label = "";
-        let fit = "icon";
-        let lw = 0;
-        if (t.variant === "error") {
-          for (const cand of errorLabelCandidates(text, theme.failedLabel)) {
-            const w = Math.ceil(measureText(cand, font));
-            if (w <= roomText) { label = cand; fit = "text"; lw = w; break; }
-          }
-        } else {
-          for (const cand of labelCandidates(text)) {
-            const w = Math.ceil(measureText(cand, font));
-            if (w <= roomBoth) { label = cand; fit = "both"; lw = w; break; }
-            if (w <= roomText) { label = cand; fit = "swap"; lw = w; break; }
-          }
-        }
+        const m = morphLabel(el);
         extra = {
           ...extra,
-          label,
-          fit,
-          lw,
-          radius: cs.borderRadius,
-          font: { fontFamily: cs.fontFamily, fontSize: cs.fontSize, fontWeight: weight },
+          label: m.label,
+          fit: m.fit,
+          lw: m.lw,
+          radius: m.cs.borderRadius,
+          font: { fontFamily: m.cs.fontFamily, fontSize: m.cs.fontSize, fontWeight: m.weight },
         };
       }
       if (d.mode !== "morph") {
         // beside a tiny control ("…", an icon): the shortest specific words, inside its card
         const er = el.getBoundingClientRect();
-        if (d.kind === "icon" || er.width < 64) extra = { ...extra, text: compactText(text, t.variant) };
         box = containerBox(el);
+        if (d.kind === "icon" || er.width < 64 || narrow || reasonLine) {
+          // the shortest specific words — and if even those do not fit the card,
+          // a shorter version that still says it ("Unpublished", "Couldn't add"),
+          // never a word cut in half
+          // card width less its margin, the icon + gap, the backing's padding and a little slack
+          const room = Math.min(standIn || reasonLine ? 340 : Infinity, (box ? box.right - box.left - 16 : window.innerWidth - 24)) - 20 - (inside ? 28 : 16) - 6;
+          const first = compactText(text, t.variant);
+          const pool = t.variant === "success" || t.variant === "info" ? labelCandidates(text) : errorLabelCandidates(text, "").slice(0, -1);
+          const fits = (x) => measureText(x, "600 12.5px Manrope, system-ui, sans-serif") <= room;
+          const short = fits(first) ? first : (pool.filter((x) => x.length < first.length).find(fits) || first);
+          extra = { ...extra, text: short, compact: true };
+        }
       }
       st.phase = "probe";
       st.frames = 0;
-      setView({ el, ...d, ...extra });
+      setView({ el, ...d, ...extra, inside, narrow });
     };
 
     const step = () => {
-      if (!alive) return;
+      if (!alive || leavingRef.current) return; // fading out where it is
       if (t.held && !isTwin && isDialogClosing(t.held)) {
         if (userClosed()) return;
         const was = st.phase;
@@ -454,8 +537,17 @@ export function AnchoredFeedback({ t, theme, zIndex }) {
         if (!a.isConnected) {
           if (relocate()) { schedule(); return; }
           // re-rendered in place before it was ever drawn (Accept → Deliver clip in the same tick)
-          const next = !isTwin && !(t.held && isDialogClosing(t.held)) ? replacementAt(lastRect || t.rect) : null;
+          // (an error belongs to the control that failed — it only follows that same
+          // item back into its list, wherever it now sits; never onto a neighbour)
+          const back = !isTwin && errorish ? controlIn(itemBack(removedItem(trail)), trail, removedItem(trail)) : null;
+          const next = back || (!isTwin && !errorish && !(t.held && isDialogClosing(t.held)) ? replacementAt(lastRect || t.rect, trail) : null);
           if (next) { anchor = next; schedule(); return; }
+          // not taken out of its list: the list is still being drawn again — give it a moment
+          const it = removedItem(trail);
+          if (it && !listShrank(it) && !isTwin && !errorish) {
+            if (!replaceUntil) replaceUntil = performance.now() + 300;
+            if (performance.now() < replaceUntil) { schedule(); return; }
+          }
           if (toGhost()) { schedule(); return; }
           alive = false; alertStore.unanchor(t.id); return;
         }
@@ -471,8 +563,8 @@ export function AnchoredFeedback({ t, theme, zIndex }) {
       if (gone && relocate()) { schedule(); return; }
       // the control was re-rendered in place (a list refresh swapped "Accept"
       // for "Deliver clip"): the result stays on what now sits there
-      if (gone && !isTwin && (lastRect || t.rect) && !(t.held && isDialogClosing(t.held))) {
-        const next = replacementAt(lastRect || t.rect); // swapped on the very first frame: where it was at the message
+      if (gone && !isTwin && !errorish && (lastRect || t.rect) && !(t.held && isDialogClosing(t.held))) {
+        const next = replacementAt(lastRect || t.rect, trail); // swapped on the very first frame: where it was at the message
         if (next && next !== a) {
           anchor = next;
           if (st.phase === "shown") setView((v) => (v ? { ...v, el: next } : v));
@@ -517,6 +609,25 @@ export function AnchoredFeedback({ t, theme, zIndex }) {
           root.style.width = `${r.width}px`;
           root.style.height = `${r.height}px`;
         }
+      } else if (v.inside) {
+        // centred on the removed card's copy (its visible part), inside its card and the screen
+        root.style.maxWidth = v.narrow ? `${Math.min(window.innerWidth - 16, 380)}px` : `${Math.max(140, r.width - 24)}px`;
+        const vh = window.innerHeight;
+        const top = Math.max(r.top, 8);
+        const bottom = Math.min(r.bottom, vh - 8);
+        const pt = Math.round(Math.max(top, (top + bottom) / 2 - root.offsetHeight / 2));
+        const w = root.offsetWidth;
+        const lo = Math.max(8, box ? box.left + 4 : 8);
+        const hi = Math.min(window.innerWidth - 8, box ? box.right - 4 : window.innerWidth - 8) - w;
+        const pl = Math.round(Math.min(Math.max(r.left + r.width / 2 - w / 2, lo), Math.max(lo, hi)));
+        const key = `${pt}|${pl}|i`;
+        if (key !== lastKey) {
+          lastKey = key;
+          root.style.top = `${pt}px`;
+          root.style.left = `${pl}px`;
+          root.dataset.side = "inside";
+          if (v.narrow) root.dataset.narrow = "1"; else delete root.dataset.narrow;
+        }
       } else {
         const side = v.mode === "side" && String(text).length <= MAX_SIDE_CHARS ? "right" : "below";
         // the inline message may be as wide as a wide control (upload area), else 320px;
@@ -530,12 +641,27 @@ export function AnchoredFeedback({ t, theme, zIndex }) {
           align = r.left + r.width / 2 > (box.left + box.right) / 2 ? "end" : "start";
         }
         const p = computePlacement(r, root.offsetWidth, root.offsetHeight, side, window.innerWidth, window.innerHeight, align, box);
+        // a control on the bottom edge of its card (price | cart): below would hang
+        // off the card — above it instead, inside the card (backed if over its words)
+        if (p.side === "below" && box && p.top + root.offsetHeight > box.bottom) {
+          const h = root.offsetHeight;
+          const up = r.top - 6 - h;
+          if (up >= box.top + 4 && up >= 8) {
+            p.top = up;
+            p.side = "above";
+          }
+        }
         const key = `${Math.round(p.top)}|${Math.round(p.left)}|${p.side}|${r.left}|${r.top}|p`;
         if (key !== lastKey) {
           lastKey = key;
           root.style.top = `${p.top}px`;
           root.style.left = `${p.left}px`;
           root.dataset.side = p.side;
+          // on a photo / cover image, or over the page's own words, the text gets a
+          // dark backing to stay readable (like a tooltip)
+          const at = { top: p.top, left: p.left, width: root.offsetWidth, height: root.offsetHeight };
+          if (overPicture(at) || !freeOfText(at)) root.dataset.onmedia = "1";
+          else delete root.dataset.onmedia;
         }
       }
       st.frames += 1;
@@ -546,11 +672,22 @@ export function AnchoredFeedback({ t, theme, zIndex }) {
       schedule();
     };
     step();
-    return () => { alive = false; cancelAnimationFrame(raf); if (stopWatch) stopWatch(); };
+    return () => { alive = false; cancelAnimationFrame(raf); if (stopWatch) stopWatch(); if (slotWatch) slotWatch.disconnect(); };
   }, [t.id, t.anchors]); // eslint-disable-line react-hooks/exhaustive-deps -- one run per message
 
   // The held dialog copy leaves together with the ✓ (and never outlives it).
   React.useEffect(() => {
+    leavingRef.current = leaving;
+    const gh = ghostRef.current;
+    if (leaving && gh) {
+      ghostRef.current = null;
+      // Undo puts the real card back in its place at once; otherwise the copy fades away
+      if (actedRef.current || !gh.style.transition) gh.remove();
+      else {
+        gh.style.opacity = "0";
+        setTimeout(() => gh.remove(), 220);
+      }
+    }
     const h = holdRef.current;
     if (!leaving || !h) return;
     holdRef.current = null;
@@ -584,7 +721,14 @@ export function AnchoredFeedback({ t, theme, zIndex }) {
     a.classList.remove("lgf-fx-pop", "lgf-fx-shake");
     void a.offsetWidth; // restart the animation if it is already running
     a.classList.add(cls);
-    const clear = () => a.classList.remove(cls);
+    let done = false;
+    // the app re-rendering the button (its loading state ends) rewrites its
+    // className: put the effect back so the shake is still seen
+    const mo = typeof MutationObserver === "function"
+      ? new MutationObserver(() => { if (!done && !a.classList.contains(cls)) a.classList.add(cls); })
+      : null;
+    if (mo) mo.observe(a, { attributes: true, attributeFilter: ["class"] });
+    const clear = () => { done = true; if (mo) mo.disconnect(); a.classList.remove(cls); };
     const onEnd = (e) => { if (e.target === a) clear(); };
     a.addEventListener("animationend", onEnd);
     const timer = setTimeout(clear, 700);
@@ -602,6 +746,16 @@ export function AnchoredFeedback({ t, theme, zIndex }) {
   const base = view && shownAt ? inlineDuration(t.variant, view.kind, view.mode, view.fit) : 0;
   const duration = base && t.actionLabel ? Math.max(base, 5000) : base; // time to press Undo
   useDismissTimer(ref, duration, close, shownAt);
+
+  // Undo: the card's copy goes in the same instant the real card comes back (no jump),
+  // and what the action sets off reports where the card was
+  const onAction = t.onAction ? () => {
+    actedRef.current = true;
+    leavingRef.current = true;
+    if (ghostRef.current) { ghostRef.current.remove(); ghostRef.current = null; }
+    retap(t.tapRef);
+    return t.onAction();
+  } : undefined;
 
   const on = shownAt ? " lgf-on" : "";
   const out = leaving ? " lgf-out" : "";
@@ -651,12 +805,13 @@ export function AnchoredFeedback({ t, theme, zIndex }) {
         aria-live={errorish ? "assertive" : "polite"}
         aria-atomic="true"
         className={`lgf-pop${on}${out}`}
+        data-compact={view && view.compact ? "1" : undefined}
         style={{ zIndex }}
       >
         <Icon size={14} strokeWidth={2.75} color={color} aria-hidden="true" />
         <span className="lgf-text" aria-hidden={view && view.text && view.text !== text ? "true" : undefined}>{(view && view.text) || text}</span>
         {view && view.text && view.text !== text ? <span style={SR_ONLY}>{text}</span> : null}
-        <ActionButton label={t.actionLabel} onAction={t.onAction} close={close} />
+        <ActionButton label={t.actionLabel} onAction={onAction} close={() => { actedRef.current = true; close(); }} />
       </div>
     </>
   );

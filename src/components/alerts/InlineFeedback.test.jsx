@@ -155,13 +155,24 @@ describe("AlertProvider inline feedback", () => {
     expect(document.querySelector('[data-lg-feedback="pop"]')).toBeNull();
   });
 
-  it("an error whose words do not fit a small button shows the common short word", async () => {
+  it("a vague error whose words do not fit a small button shows the common short word", async () => {
     render(<AlertProvider appearance="snackbar" autoAnchor failedLabel="Fehlgeschlagen" />);
     const btn = addButton('<button type="button">Post</button>');
-    rect(btn, { top: 100, left: 100, width: 130, height: 40 }); // jsdom 7.5px/char: "No connection" 97px > swap room 116? no → fits swap
+    rect(btn, { top: 100, left: 100, width: 130, height: 40 }); // jsdom 7.5px/char
     tap(btn);
-    act(() => { compatToast.error("Your session could not be refreshed right now. Sign in again."); });
+    act(() => { compatToast.error("Something went wrong while refreshing your session right now"); });
     await waitFor(() => expect(document.querySelector('[data-lg-feedback="morph"] .lgf-mlabel')?.textContent).toBe("Fehlgeschlagen"));
+  });
+
+  it("an error with a reason the button cannot hold says the reason beside it, not just Failed", async () => {
+    render(<AlertProvider appearance="snackbar" autoAnchor failedLabel="Fehlgeschlagen" />);
+    const btn = addButton('<button type="button">Message</button>');
+    rect(btn, { top: 100, left: 100, width: 130, height: 40 });
+    tap(btn);
+    act(() => { compatToast.error("Follow this creator to start a conversation."); });
+    await waitFor(() => expect(document.querySelector('[data-lg-feedback="pop"]')).not.toBeNull());
+    expect(document.querySelector('[data-lg-feedback="pop"]').textContent).toMatch(/Follow this creator/);
+    expect(document.querySelector('[data-lg-feedback="morph"]')).toBeNull();
   });
 
   it("loading and sticky messages never anchor", async () => {

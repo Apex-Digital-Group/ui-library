@@ -90,6 +90,8 @@ function fireMessage(variant, content, duration, onClose) {
     anchor: cfg.anchor,
     actionLabel: cfg.actionLabel,
     onAction: cfg.onAction,
+    // antd's `key`: a message opened again with it replaces the first; destroy(key) closes only it
+    id: cfg.key != null ? `msg_${cfg.key}` : undefined,
   });
   if (typeof onClose === "function" && secs > 0) setTimeout(onClose, secs * 1000);
   const close = () => alertStore.dismiss(id);
@@ -106,7 +108,7 @@ export const message = {
   loading: (c, d, cb) => fireMessage("loading", c, d, cb),
   open: (cfg = {}) => fireMessage(cfg.type === "loading" ? "loading" : (cfg.type || "info"), cfg, cfg.duration, cfg.onClose),
   config: () => {},
-  destroy: () => alertStore.dismissAll(),
+  destroy: (key) => (key == null ? alertStore.dismissAll() : alertStore.dismiss(`msg_${key}`)),
 };
 
 // ---------------------------------------------------------------------------
