@@ -41,4 +41,23 @@ describe('PostCard', () => {
     expect(container.querySelector('.bond-post-card__color-tile')).toBeNull()
     expect(container.querySelector('.bond-post-card__caption')).not.toBeNull()
   })
+  it('renders a plain <video> for video media by default', () => {
+    const media = [{ url: 'https://example.test/a.mp4', type: 'video' }]
+    const { container } = render(<PostCard caption="v" media={media} />)
+    const video = container.querySelector('.bond-post-card__media video')
+    expect(video).not.toBeNull()
+    expect(video.getAttribute('src')).toBe('https://example.test/a.mp4')
+  })
+
+  it('lets the host render video media via renderVideo', () => {
+    const media = [{ url: 'https://example.test/a.mp4', type: 'video', id: 7 }]
+    const { container } = render(
+      <PostCard caption="v" media={media}
+        renderVideo={(item, props) => <div data-testid="host-video" data-id={item.id} data-autoplay={String(props.autoPlay)} />} />
+    )
+    const hostVideo = screen.getByTestId('host-video')
+    expect(hostVideo.dataset.id).toBe('7')
+    expect(hostVideo.dataset.autoplay).toBe('true')
+    expect(container.querySelector('.bond-post-card__media video')).toBeNull()
+  })
 })

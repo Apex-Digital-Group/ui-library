@@ -49,6 +49,10 @@ export default function PostCard({
   // Host-injected wrapper around the author avatar/name (e.g. a hover
   // profile card). Identity by default so the component stays host-agnostic.
   authorWrapper = (children) => children,
+  // Host-injected video renderer: (item, videoProps) => node. Lets the host
+  // play an HLS rendition (hls.js) instead of a bare <video src>. Default is
+  // the plain <video>, so hosts that pass nothing are unchanged.
+  renderVideo = (item, videoProps) => <video src={item.url} {...videoProps} />,
 }) {
   const [showPicker, setShowPicker] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -260,8 +264,10 @@ export default function PostCard({
       {item ? (
         <div className={`bond-post-card__media ${locked.isLocked ? "bond-post-card__media--blur" : ""}`}>
           {item.type === "video" ? (
-            <video src={item.url} autoPlay muted loop playsInline
-              onClick={(e) => { stop(e); onOpenMedia && onOpenMedia(isGallery ? mediaIndex : 0); }} />
+            renderVideo(item, {
+              autoPlay: true, muted: true, loop: true, playsInline: true,
+              onClick: (e) => { stop(e); onOpenMedia && onOpenMedia(isGallery ? mediaIndex : 0); },
+            })
           ) : (
             <img src={item.url} alt="post media"
               onClick={(e) => { stop(e); onOpenMedia && onOpenMedia(isGallery ? mediaIndex : 0); }} />
