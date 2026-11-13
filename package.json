@@ -9,6 +9,7 @@
     ".": "./src/index.js",
     "./story/StoryCard": "./src/components/story/StoryCard.jsx",
     "./feed/PostCard": "./src/components/feed/PostCard.jsx",
+    "./feed/ReactionStack": "./src/components/feed/ReactionStack.jsx",
     "./listing/ListingToolbar": "./src/components/listing/ListingToolbar.jsx",
     "./ModalHeader": "./src/components/ModalHeader.jsx",
     "./settings/SettingsSection": "./src/components/settings/SettingsSection.jsx",
