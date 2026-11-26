@@ -134,6 +134,7 @@ export { default as ReferTokenWallet } from './components/refer/ReferTokenWallet
 export { default as AccountPendingModal } from './components/AccountPendingModal'
 export { default as CreditsModal } from './components/CreditsModal'
 export { default as ModalHeader } from './components/ModalHeader'
+export { AvatarActionMenu } from './components/avatar/AvatarActionMenu'
 export {
   default as SettingsSection, SettingsRow, SettingsButton, SettingsActionChip,
   SettingsToggle, SettingsStepper, SettingsPillGroup,
@@ -225,6 +226,7 @@ export {
 
 // story
 export { StoryCard } from './components/story/StoryCard'
+export { StoryRing } from './components/story/StoryRing'
 
 // react-query client instance (apps can re-use the same defaults as base44)
 export { queryClientInstance } from './lib/query-client'
