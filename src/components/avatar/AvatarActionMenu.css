@@ -7,7 +7,9 @@
   display: inline-flex;
 }
 
-/* 44×44 hit area regardless of the visual badge size. */
+/* 44×44 hit area regardless of the visual badge size. Square on purpose:
+   browsers clip hit-testing to border-radius, so a round trigger would lose
+   its corners. The visible focus ring sits on the round badge instead. */
 .bond-aam__trigger {
   display: inline-flex;
   align-items: center;
@@ -17,7 +19,7 @@
   padding: 0;
   margin: 0;
   border: 0;
-  border-radius: 9999px;
+  border-radius: 0;
   background: transparent;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -27,9 +29,9 @@
   outline: none;
 }
 
-.bond-aam__trigger:focus-visible {
+.bond-aam__trigger:focus-visible .bond-aam__badge {
   outline: 2px solid #fff;
-  outline-offset: 2px;
+  outline-offset: 4px;
 }
 
 .bond-aam__badge {
