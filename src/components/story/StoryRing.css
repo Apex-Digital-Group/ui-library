@@ -31,7 +31,9 @@
 }
 
 .bond-story-ring[data-state="seen"]::before {
-  background: #4b5563; /* gray-600 (viewed) — same as StoryCard */
+  /* gray-400 (viewed): StoryCard uses gray-600, but on the profile hero that
+     sits below 3:1 and blends into the avatar's own translucent border. */
+  background: #9ca3af;
 }
 
 .bond-story-ring[data-state="none"]::before {
