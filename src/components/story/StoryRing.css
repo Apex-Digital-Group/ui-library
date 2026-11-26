@@ -38,8 +38,9 @@
   display: none;
 }
 
-/* Keyboard focus on the avatar's control: a white outline just outside the ring. */
-.bond-story-ring:not([data-state="none"]):has(:focus-visible) {
+/* Keyboard focus on the avatar's control: a white outline just outside the
+   ring (same place without a ring, so the control always shows focus). */
+.bond-story-ring:has(:focus-visible) {
   outline: 2px solid #fff;
   outline-offset: calc(var(--bsr-thickness, 3px) + var(--bsr-gap, 3px) + 2px);
 }
