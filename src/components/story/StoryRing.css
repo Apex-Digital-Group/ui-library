@@ -1,0 +1,51 @@
+/* StoryRing — live-story ring around a round avatar. Plain CSS like every
+   other lib component: consumers don't run Tailwind over lib sources. */
+
+.bond-story-ring {
+  position: relative;
+  display: inline-flex;
+  border-radius: 9999px;
+  vertical-align: middle;
+}
+
+/* The ring sits outside the child: a band `thickness` wide, `gap` away from
+   it. The mask cuts the padding box out of the border box so the gap stays
+   transparent whatever is behind the avatar. */
+.bond-story-ring::before {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * (var(--bsr-thickness, 3px) + var(--bsr-gap, 3px)));
+  padding: var(--bsr-thickness, 3px);
+  border-radius: 9999px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 180ms ease;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+.bond-story-ring[data-state="new"]::before {
+  background: linear-gradient(to top right, #facc15, #ec4899, #9333ea);
+}
+
+.bond-story-ring[data-state="seen"]::before {
+  background: #4b5563; /* gray-600 (viewed) — same as StoryCard */
+}
+
+.bond-story-ring[data-state="none"]::before {
+  display: none;
+}
+
+/* Keyboard focus on the avatar's control: a white outline just outside the ring. */
+.bond-story-ring:not([data-state="none"]):has(:focus-visible) {
+  outline: 2px solid #fff;
+  outline-offset: calc(var(--bsr-thickness, 3px) + var(--bsr-gap, 3px) + 2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bond-story-ring::before {
+    transition: none;
+  }
+}

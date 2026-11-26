@@ -8,6 +8,7 @@
   "exports": {
     ".": "./src/index.js",
     "./story/StoryCard": "./src/components/story/StoryCard.jsx",
+    "./story/StoryRing": "./src/components/story/StoryRing.jsx",
     "./feed/PostCard": "./src/components/feed/PostCard.jsx",
     "./feed/ReactionStack": "./src/components/feed/ReactionStack.jsx",
     "./listing/ListingToolbar": "./src/components/listing/ListingToolbar.jsx",

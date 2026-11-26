@@ -226,6 +226,7 @@ export {
 
 // story
 export { StoryCard } from './components/story/StoryCard'
+export { StoryRing } from './components/story/StoryRing'
 
 // react-query client instance (apps can re-use the same defaults as base44)
 export { queryClientInstance } from './lib/query-client'
