@@ -134,6 +134,7 @@ export { default as ReferTokenWallet } from './components/refer/ReferTokenWallet
 export { default as AccountPendingModal } from './components/AccountPendingModal'
 export { default as CreditsModal } from './components/CreditsModal'
 export { default as ModalHeader } from './components/ModalHeader'
+export { AvatarActionMenu } from './components/avatar/AvatarActionMenu'
 export {
   default as SettingsSection, SettingsRow, SettingsButton, SettingsActionChip,
   SettingsToggle, SettingsStepper, SettingsPillGroup,

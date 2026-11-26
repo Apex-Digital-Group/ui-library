@@ -12,6 +12,7 @@
     "./feed/ReactionStack": "./src/components/feed/ReactionStack.jsx",
     "./listing/ListingToolbar": "./src/components/listing/ListingToolbar.jsx",
     "./ModalHeader": "./src/components/ModalHeader.jsx",
+    "./avatar/AvatarActionMenu": "./src/components/avatar/AvatarActionMenu.jsx",
     "./settings/SettingsSection": "./src/components/settings/SettingsSection.jsx",
     "./security/Security": "./src/components/security/Security.jsx",
     "./favourites/Favourites": "./src/components/favourites/Favourites.jsx",
