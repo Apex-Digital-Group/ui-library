@@ -99,6 +99,16 @@ describe('AvatarActionMenu (desktop)', () => {
     outside.remove()
   })
 
+  it('exposes the badge button through triggerRef (object and callback refs)', () => {
+    const objectRef = { current: null }
+    const { unmount } = render(<AvatarActionMenu items={makeItems()} triggerRef={objectRef} />)
+    expect(objectRef.current).toBe(trigger())
+    unmount()
+    const callbackRef = vi.fn()
+    render(<AvatarActionMenu items={makeItems()} triggerRef={callbackRef} />)
+    expect(callbackRef).toHaveBeenCalledWith(trigger())
+  })
+
   it('does not fire a disabled item', async () => {
     const user = userEvent.setup()
     const items = makeItems({ view: { disabled: true } })
@@ -220,6 +230,13 @@ describe('AvatarActionMenu (phone bottom sheet)', () => {
     await user.keyboard('{Escape}')
     await waitFor(() => expect(trigger()).toHaveAttribute('aria-expanded', 'false'))
     expect(dialog).toHaveAttribute('data-state', 'closed')
+  })
+
+  it('exposes the sheet badge through triggerRef', async () => {
+    const ref = { current: null }
+    render(<AvatarActionMenu items={makeItems()} mobileBreakpoint={651} triggerRef={ref} />)
+    await waitFor(() => expect(ref.current).toBe(trigger()))
+    expect(ref.current).toHaveAttribute('aria-haspopup', 'menu')
   })
 
   it('respects a controlled open prop', async () => {

@@ -21,6 +21,8 @@ import "./AvatarActionMenu.css";
  * don't run Tailwind over lib sources. Every element that can receive events
  * (the root and the portalled menu / sheet) carries `data-bond-avatar-menu`,
  * so a consumer's own click handlers can ignore events bubbling out of it.
+ * Pass `triggerRef` to get the badge button, e.g. to return focus to it after
+ * a dialog opened from the menu closes.
  *
  *   <AvatarActionMenu
  *     items={[
@@ -145,10 +147,19 @@ export function AvatarActionMenu({
   icon: Icon = Plus,
   className = "",
   modal = false,
+  triggerRef: externalTriggerRef,
 }) {
   const [isOpen, setOpen] = useControllableOpen(open, onOpenChange);
   const isMobile = useIsMobile(mobileBreakpoint);
   const triggerRef = React.useRef(null);
+  const setTriggerRef = React.useCallback(
+    (node) => {
+      triggerRef.current = node;
+      if (typeof externalTriggerRef === "function") externalTriggerRef(node);
+      else if (externalTriggerRef) externalTriggerRef.current = node;
+    },
+    [externalTriggerRef],
+  );
   const sheetRef = React.useRef(null);
   const visibleItems = items.filter((item) => item && !item.hidden);
   const rootClass = `bond-aam ${className}`.trim();
@@ -163,7 +174,7 @@ export function AvatarActionMenu({
     return (
       <span className={rootClass} data-bond-avatar-menu="">
         <Badge
-          ref={triggerRef}
+          ref={setTriggerRef}
           {...badgeProps}
           aria-haspopup="menu"
           aria-expanded={isOpen}
@@ -203,13 +214,14 @@ export function AvatarActionMenu({
     <span className={rootClass} data-bond-avatar-menu="">
       <DropdownMenu.Root open={isOpen} onOpenChange={setOpen} modal={modal}>
         <DropdownMenu.Trigger asChild>
-          <Badge ref={triggerRef} {...badgeProps} />
+          <Badge ref={setTriggerRef} {...badgeProps} />
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
           <DropdownMenu.Content
             side="bottom"
             align="end"
             sideOffset={8}
+            collisionPadding={12}
             className="bond-aam__content"
             aria-label={title}
             aria-labelledby={undefined}
