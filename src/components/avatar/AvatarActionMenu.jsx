@@ -43,6 +43,13 @@ function useControllableOpen(open, onOpenChange) {
   return [value, setValue];
 }
 
+// An item's action may open something that takes focus (a viewer dialog, a
+// new page). Only return focus to the badge when nothing else has claimed it.
+function focusMovedElsewhere() {
+  const active = typeof document !== "undefined" ? document.activeElement : null;
+  return !!active && active !== document.body;
+}
+
 function renderIcon(Icon) {
   if (!Icon) return null;
   if (React.isValidElement(Icon)) return Icon;
@@ -178,7 +185,7 @@ export function AvatarActionMenu({
               }}
               onCloseAutoFocus={(event) => {
                 event.preventDefault();
-                if (triggerRef.current) triggerRef.current.focus();
+                if (!focusMovedElsewhere() && triggerRef.current) triggerRef.current.focus();
               }}
             >
               <div aria-hidden="true" className="bond-aam__handle" />
@@ -207,6 +214,11 @@ export function AvatarActionMenu({
             aria-label={title}
             aria-labelledby={undefined}
             data-bond-avatar-menu=""
+            onCloseAutoFocus={(event) => {
+              if (focusMovedElsewhere() && document.activeElement !== triggerRef.current) {
+                event.preventDefault();
+              }
+            }}
           >
             {visibleItems.map((item) => (
               <DropdownMenu.Item

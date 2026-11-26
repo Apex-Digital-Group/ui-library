@@ -83,6 +83,22 @@ describe('AvatarActionMenu (desktop)', () => {
     expect(document.activeElement).toBe(trigger())
   })
 
+  it('leaves focus where an action moved it (e.g. a dialog it opened)', async () => {
+    const user = userEvent.setup()
+    const outside = document.createElement('button')
+    outside.textContent = 'dialog'
+    document.body.appendChild(outside)
+    const items = makeItems({ view: { onSelect: () => outside.focus() } })
+    render(<AvatarActionMenu items={items} />)
+    trigger().focus()
+    await user.keyboard('{Enter}')
+    await user.click(await screen.findByRole('menuitem', { name: 'View photo' }))
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull())
+    await new Promise((r) => setTimeout(r, 20))
+    expect(document.activeElement).toBe(outside)
+    outside.remove()
+  })
+
   it('does not fire a disabled item', async () => {
     const user = userEvent.setup()
     const items = makeItems({ view: { disabled: true } })
